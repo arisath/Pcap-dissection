@@ -1,2 +1,2 @@
 # Pcap-dissection
-Pcap dissection using jnetpcap
+Java .pcap dissector using jnetpcap (http://jnetpcap.com/)
