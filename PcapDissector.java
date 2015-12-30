@@ -101,8 +101,6 @@ class PcapDissector
                         if (packet.hasHeader(http))
                         {
                             processHTTPheader();
-
-                            //System.out.println(http.contentType()+" "+numberOfPackets);
                         }
 
                         if (packet.hasHeader(webimage))
