@@ -95,32 +95,33 @@ class PcapDissection
                 {
                     numberOfPackets++;
 
-                    if (packet.hasHeader(ethernet) )
+                    if (packet.hasHeader(ethernet))
                     {
                         processEthernetheader();
-                    }
-                    if (packet.hasHeader(ip))
-                    {
-                        processIPheader();
 
-                        if (packet.hasHeader(tcp))
+                        if (packet.hasHeader(ip))
                         {
-                            processTCPheader();
-                        }
-                        else if (packet.hasHeader(udp))
-                        {
-                            processUDPheader();
-                        }
+                            processIPheader();
 
-                        if (packet.hasHeader(http))
-                        {
-                            processHTTPheader();
+                            if (packet.hasHeader(tcp))
+                            {
+                                processTCPheader();
+                            }
+                            else if (packet.hasHeader(udp))
+                            {
+                                processUDPheader();
+                            }
 
-                        }
+                            if (packet.hasHeader(http))
+                            {
+                                processHTTPheader();
 
-                        if (packet.hasHeader(webimage))
-                        {
-                            processImage();
+                            }
+
+                            if (packet.hasHeader(webimage))
+                            {
+                                processImage();
+                            }
                         }
                     }
                 }
@@ -135,7 +136,7 @@ class PcapDissection
             printIPaddressesVisited(ipAddressesVisited);
             printTCPflagsStatistics();
             printImageTypes();
-            System.out.println(numberOfEthernetPackets);
+
         }
         catch (Exception e)
         {
@@ -148,6 +149,11 @@ class PcapDissection
 
     }
 
+    /**
+     * Returns the MAC address of the current machine in 00:00:00:00:00:00 format
+     *
+     * @return
+     */
     static String getMacAddress()
     {
         try
@@ -180,10 +186,11 @@ class PcapDissection
         return null;
     }
 
+    /**
+     * Processes the ethernet header of this packet
+     */
     static void processEthernetheader()
     {
-        numberOfEthernetPackets++;
-
         if ((new String(FormatUtils.hexdump(ethernet.getHeader())).substring(45, 50)).equals("08 06"))
         {
             numberOfARP++;
@@ -193,9 +200,11 @@ class PcapDissection
         String destinationMac = FormatUtils.mac(ethernet.destination());
 
         separateIngoingOutgoing(sourceMac, destinationMac);
-
     }
 
+    /**
+     * Processes the IP header of this packet
+     */
     static void processIPheader()
     {
         numberOfIPpackets++;
@@ -207,6 +216,13 @@ class PcapDissection
         getDestinationAddress(sourceIP, destinationIP);
     }
 
+    /**
+     * Separates ingoing from outgoing traffic based on the
+     * MAC addresses of the ethernet header
+     *
+     * @param sourceMac
+     * @param destinationMac
+     */
     public static void separateIngoingOutgoing(String sourceMac, String destinationMac)
     {
         if (sourceMac.equalsIgnoreCase(macAddress))
@@ -219,7 +235,9 @@ class PcapDissection
         }
     }
 
-
+    /**
+     * Processes the TCP header of this packet
+     */
     static void processTCPheader()
     {
         numberOfTcpPackets++;
@@ -237,6 +255,11 @@ class PcapDissection
         processPorts(sport, dport);
     }
 
+    /**
+     * Processes the flags of this packet's TCP header
+     * TCP Flags include: [SYN], [SYN ACK], [ACK], [PSH ACK]
+     * [FIN PSH ACK], [FIN ACK], [RST]
+     */
     static void processTCPflags()
     {
         if (tcp.flags_SYN() && (!tcp.flags_ACK()))
@@ -267,9 +290,14 @@ class PcapDissection
         {
             numberOfRST++;
         }
-
     }
 
+    /**
+     * Processes the ports of a packet using transport layer protocols (TCP, UDP)
+     *
+     * @param sport sourcePort
+     * @param dport destinationPort
+     */
     static void processPorts(int sport, int dport)
     {
         if (sport == 53 || dport == 53)
@@ -282,6 +310,9 @@ class PcapDissection
         }
     }
 
+    /**
+     * Processes the UDP header of this packet
+     */
     static void processUDPheader()
     {
         numberOfUdpPackets++;
@@ -297,6 +328,9 @@ class PcapDissection
         processPorts(sport, dport);
     }
 
+    /**
+     * Processes the HTTP header of this packet
+     */
     static void processHTTPheader()
     {
         numberOfHTTPpackets++;
@@ -311,6 +345,9 @@ class PcapDissection
         }
     }
 
+    /**
+     * Processes images transferred over HTTP
+     */
     static void processImage()
     {
         numberOfImages++;
@@ -329,6 +366,10 @@ class PcapDissection
         }
     }
 
+    /**
+     * Prints the distributions among the different image types that
+     * have been downloaded in the machine
+     */
     static void printImageTypes()
     {
         writer.printf("%s %d %s \n", "Found ", numberOfImages, " images:");
@@ -339,14 +380,25 @@ class PcapDissection
         }
     }
 
-    static void getDestinationAddress(String sourceIP, String destinationIP)
+    /**
+     * Adds the IP destination address to list of IP addresses visited
+     *
+     * @param sourceMac
+     * @param destinationIP
+     */
+    static void getDestinationAddress(String sourceMac, String destinationIP)
     {
-        if (sourceIP.equals(macAddress))
+        if (sourceMac.equals(macAddress))
         {
             ipAddressesVisited.add(destinationIP);
         }
     }
 
+    /**
+     * Prints the ports that have been used
+     *
+     * @param portsUsed
+     */
     static void printPortsUsed(TreeSet<Integer> portsUsed)
     {
         writer.println();
@@ -369,6 +421,11 @@ class PcapDissection
         writer.println();
     }
 
+    /**
+     * Prints the IP addresses that were visited
+     *
+     * @param ipAddressesVisited
+     */
     static void printIPaddressesVisited(HashSet<String> ipAddressesVisited)
     {
         writer.println();
@@ -392,6 +449,10 @@ class PcapDissection
         writer.println();
     }
 
+    /**
+     * Prints traffic statistics related to different protocols from different OSI layers
+     * Protocols include: Ethernet, ARP, IP, TCP/UDP, SSL/TLS, DNS, HTTP
+     */
     static void printTrafficStatistics()
     {
         writer.printf("%-46s %s %d \n", "Total number of packets in pcap", ": ", numberOfPackets);
@@ -409,6 +470,11 @@ class PcapDissection
         writer.printf("%-45s  %s %d \n", "Number of POST requests", ": ", numberOfPosts);
     }
 
+    /**
+     * Prints the distributions among different TCP flags
+     * TCP Flags include: [SYN], [SYN ACK], [ACK], [PSH ACK]
+     * [FIN PSH ACK], [FIN ACK], [RST]
+     */
     static void printTCPflagsStatistics()
     {
         writer.println();
