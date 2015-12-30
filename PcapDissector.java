@@ -76,7 +76,7 @@ class PcapDissection
 
             writer = new PrintWriter("Report.txt", "UTF-8");
 
-            String pcapName = "fooo.pcap";
+            String pcapName = "InsertPcapNameHere.pcap";
 
             StringBuilder errbuf = new StringBuilder();
 
