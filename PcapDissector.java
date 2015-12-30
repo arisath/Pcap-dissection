@@ -2,16 +2,17 @@ import org.jnetpcap.Pcap;
 import org.jnetpcap.packet.PcapPacket;
 import org.jnetpcap.packet.PcapPacketHandler;
 import org.jnetpcap.packet.format.FormatUtils;
+import org.jnetpcap.protocol.application.WebImage;
 import org.jnetpcap.protocol.network.Ip4;
 import org.jnetpcap.protocol.tcpip.Http;
 import org.jnetpcap.protocol.tcpip.Tcp;
 import org.jnetpcap.protocol.tcpip.Udp;
-import org.jnetpcap.protocol.wan.PPP;
 
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.TreeSet;
 
 
@@ -21,6 +22,7 @@ class PcapDissector
     static final Tcp tcp = new Tcp();
     static final Udp udp = new Udp();
     static final Ip4 ip = new Ip4();
+    static final WebImage webimage = new WebImage();
 
     static int numberOfPacketsSent = 0;
     static int numberOfPacketsReceived = 0;
@@ -44,16 +46,13 @@ class PcapDissector
     static int numberOfHTTPpackets = 0;
     static int numberOfGETS = 0;
     static int numberOfPosts = 0;
-    
-    static int numberOfSockets = 0;
-    static int numberOfDNSqueries = 0;
-    static int numberOfDNSreplies = 0;
+    static int numberOfImages = 0;
     
     static String localhost = "";
 
     static HashSet<String> ipAddressesVisited = new HashSet<String>();
     static TreeSet<Integer> portsUsed = new TreeSet<>();
-
+    static HashMap<String, Integer> imageTypes = new HashMap<String, Integer>();
 
 
     static PrintWriter writer;
@@ -67,7 +66,7 @@ class PcapDissector
 
             writer = new PrintWriter("Report.txt", "UTF-8");
 
-            String pcapName = "insertPcapName";
+            String pcapName = "insertPcapNameHere.pcap";
 
             StringBuilder errbuf = new StringBuilder();
 
@@ -79,7 +78,6 @@ class PcapDissector
 
                 return;
             }
-
             PcapPacketHandler<String> jpacketHandler = new PcapPacketHandler<String>()
             {
 
@@ -103,8 +101,14 @@ class PcapDissector
                         if (packet.hasHeader(http))
                         {
                             processHTTPheader();
+
+                            //System.out.println(http.contentType()+" "+numberOfPackets);
                         }
 
+                        if (packet.hasHeader(webimage))
+                        {
+                            processImage();
+                        }
 
                     }
                 }
@@ -118,7 +122,7 @@ class PcapDissector
             printPortsUsed(portsUsed);
             printIPaddressesVisited(ipAddressesVisited);
             printTCPflagsStatistics();
-            
+            printImageTypes();
         }
         catch (Exception e)
         {
@@ -185,7 +189,7 @@ class PcapDissector
         {
             numberOfSYNACK++;
         }
-        else if (tcp.flags_ACK() && (!tcp.flags_SYN()) && (!tcp.flags_PSH()) && (!tcp.flags_FIN())&&(!tcp.flags_RST()))
+        else if (tcp.flags_ACK() && (!tcp.flags_SYN()) && (!tcp.flags_PSH()) && (!tcp.flags_FIN()) && (!tcp.flags_RST()))
         {
             numberOfACK++;
         }
@@ -201,24 +205,25 @@ class PcapDissector
         {
             numberOfFINPSHACK++;
         }
-        else if(tcp.flags_RST())
+        else if (tcp.flags_RST())
         {
             numberOfRST++;
         }
 
     }
 
-   static void processPorts(int sport, int dport)
-   {
-       if (sport == 53 || dport == 53)
-       {
-           numberOfDNS++;
-       }
-       else if (sport == 443 || dport == 443)
-       {
-           numberOfSslTls++;
-       }
-   }
+    static void processPorts(int sport, int dport)
+    {
+        if (sport == 53 || dport == 53)
+        {
+            numberOfDNS++;
+        }
+        else if (sport == 443 || dport == 443)
+        {
+            numberOfSslTls++;
+        }
+    }
+
     static void processUDPheader()
     {
         numberOfUdpPackets++;
@@ -245,6 +250,34 @@ class PcapDissector
         else if (http.header().contains("POST"))
         {
             numberOfPosts++;
+        }
+    }
+
+    static void processImage()
+    {
+        numberOfImages++;
+
+        String imageType = http.contentTypeEnum().toString();
+
+        Integer count = imageTypes.get(imageType);
+
+        if (count == null)
+        {
+            imageTypes.put(imageType, 1);
+        }
+        else
+        {
+            imageTypes.put(imageType, count + 1);
+        }
+    }
+
+    static void printImageTypes()
+    {
+        writer.printf("%s %d %s \n", "Found ", numberOfImages, " images:");
+
+        for (Map.Entry entry : imageTypes.entrySet())
+        {
+            writer.printf("%-4s %s %d \n", entry.getKey(), " ", entry.getValue());
         }
     }
 
@@ -315,16 +348,19 @@ class PcapDissector
         writer.printf("%-45s  %s %d \n", "Number of  GET requests", ": ", numberOfGETS);
         writer.printf("%-45s  %s %d \n", "Number of POST requests", ": ", numberOfPosts);
     }
+
     static void printTCPflagsStatistics()
     {
+        writer.println();
         writer.println("TCP Flags distribution: ");
-        writer.printf("%-12s %s %8d %5.2f %s \n","SYN",": " , numberOfSYN, ((float)numberOfSYN)/numberOfTcpPackets*100,"%");
-        writer.printf("%-12s %s %8d %5.2f %s \n","SYN ACK",": " , numberOfSYNACK, ((float)numberOfSYNACK)/numberOfTcpPackets*100,"%");
-        writer.printf("%-12s %s %8d %5.2f %s \n","ACK",": " , numberOfACK, ((float)numberOfACK)/numberOfTcpPackets*100,"%");
-        writer.printf("%-12s %s %8d %5.2f %s \n","PSH ACK",": " , numberOfPSHACK, ((float)numberOfPSHACK)/numberOfTcpPackets*100,"%");
-        writer.printf("%-12s %s %8d %5.2f %s \n","FIN PSH ACK",": " , numberOfFINPSHACK, ((float)numberOfFINPSHACK)/numberOfTcpPackets*100,"%");
-        writer.printf("%-12s %s %8d %5.2f %s \n","FIN ACK",": " , numberOfFINACK, ((float)numberOfFINACK)/numberOfTcpPackets*100,"%");
-        writer.printf("%-12s %s %8d %5.2f %s \n","RST",": " , numberOfRST, ((float)numberOfRST)/numberOfTcpPackets*100,"%");
+        writer.printf("%-12s %s %8d %5.2f %s \n", "SYN", ": ", numberOfSYN, ((float) numberOfSYN) / numberOfTcpPackets * 100, "%");
+        writer.printf("%-12s %s %8d %5.2f %s \n", "SYN ACK", ": ", numberOfSYNACK, ((float) numberOfSYNACK) / numberOfTcpPackets * 100, "%");
+        writer.printf("%-12s %s %8d %5.2f %s \n", "ACK", ": ", numberOfACK, ((float) numberOfACK) / numberOfTcpPackets * 100, "%");
+        writer.printf("%-12s %s %8d %5.2f %s \n", "PSH ACK", ": ", numberOfPSHACK, ((float) numberOfPSHACK) / numberOfTcpPackets * 100, "%");
+        writer.printf("%-12s %s %8d %5.2f %s \n", "FIN PSH ACK", ": ", numberOfFINPSHACK, ((float) numberOfFINPSHACK) / numberOfTcpPackets * 100, "%");
+        writer.printf("%-12s %s %8d %5.2f %s \n", "FIN ACK", ": ", numberOfFINACK, ((float) numberOfFINACK) / numberOfTcpPackets * 100, "%");
+        writer.printf("%-12s %s %8d %5.2f %s \n", "RST", ": ", numberOfRST, ((float) numberOfRST) / numberOfTcpPackets * 100, "%");
+        writer.println();
     }
 }
 
