@@ -3,30 +3,40 @@ import org.jnetpcap.packet.PcapPacket;
 import org.jnetpcap.packet.PcapPacketHandler;
 import org.jnetpcap.packet.format.FormatUtils;
 import org.jnetpcap.protocol.application.WebImage;
+import org.jnetpcap.protocol.lan.Ethernet;
 import org.jnetpcap.protocol.network.Ip4;
+import org.jnetpcap.protocol.network.Ip6;
 import org.jnetpcap.protocol.tcpip.Http;
 import org.jnetpcap.protocol.tcpip.Tcp;
 import org.jnetpcap.protocol.tcpip.Udp;
 
 import java.io.PrintWriter;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.TreeSet;
 
 
-class PcapDissector
+class PcapDissection
 {
+    static final Ethernet ethernet = new Ethernet();
     static final Http http = new Http();
     static final Tcp tcp = new Tcp();
     static final Udp udp = new Udp();
     static final Ip4 ip = new Ip4();
+    static final Ip6 ip6 = new Ip6();
     static final WebImage webimage = new WebImage();
 
     static int numberOfPacketsSent = 0;
     static int numberOfPacketsReceived = 0;
     static int numberOfPackets = 0;
+
+    static int numberOfEthernetPackets = 0;
+    static int numberOfARP = 0;
 
     static int numberOfIPpackets = 0;
 
@@ -47,8 +57,8 @@ class PcapDissector
     static int numberOfGETS = 0;
     static int numberOfPosts = 0;
     static int numberOfImages = 0;
-    
-    static String localhost = "";
+
+    static String macAddress = "";
 
     static HashSet<String> ipAddressesVisited = new HashSet<String>();
     static TreeSet<Integer> portsUsed = new TreeSet<>();
@@ -62,11 +72,11 @@ class PcapDissector
 
         try
         {
-            localhost = InetAddress.getLocalHost().getHostAddress();
+            macAddress = getMacAddress();
 
             writer = new PrintWriter("Report.txt", "UTF-8");
 
-            String pcapName = "insertPcapNameHere.pcap";
+            String pcapName = "fooo.pcap";
 
             StringBuilder errbuf = new StringBuilder();
 
@@ -85,6 +95,10 @@ class PcapDissector
                 {
                     numberOfPackets++;
 
+                    if (packet.hasHeader(ethernet) )
+                    {
+                        processEthernetheader();
+                    }
                     if (packet.hasHeader(ip))
                     {
                         processIPheader();
@@ -101,13 +115,13 @@ class PcapDissector
                         if (packet.hasHeader(http))
                         {
                             processHTTPheader();
+
                         }
 
                         if (packet.hasHeader(webimage))
                         {
                             processImage();
                         }
-
                     }
                 }
 
@@ -121,6 +135,7 @@ class PcapDissector
             printIPaddressesVisited(ipAddressesVisited);
             printTCPflagsStatistics();
             printImageTypes();
+            System.out.println(numberOfEthernetPackets);
         }
         catch (Exception e)
         {
@@ -133,6 +148,54 @@ class PcapDissector
 
     }
 
+    static String getMacAddress()
+    {
+        try
+        {
+            InetAddress ip2 = InetAddress.getLocalHost();
+
+            NetworkInterface network = NetworkInterface.getByInetAddress(ip2);
+
+            byte[] mac = network.getHardwareAddress();
+
+            if (mac != null)
+            {
+                StringBuilder sb = new StringBuilder();
+
+                for (int i = 0; i < mac.length; i++)
+                {
+                    sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
+                }
+                return sb.toString().replaceAll("-", ":");
+            }
+        }
+        catch (UnknownHostException e)
+        {
+            e.printStackTrace();
+        }
+        catch (SocketException e)
+        {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    static void processEthernetheader()
+    {
+        numberOfEthernetPackets++;
+
+        if ((new String(FormatUtils.hexdump(ethernet.getHeader())).substring(45, 50)).equals("08 06"))
+        {
+            numberOfARP++;
+        }
+        String sourceMac = FormatUtils.mac(ethernet.source());
+
+        String destinationMac = FormatUtils.mac(ethernet.destination());
+
+        separateIngoingOutgoing(sourceMac, destinationMac);
+
+    }
+
     static void processIPheader()
     {
         numberOfIPpackets++;
@@ -141,19 +204,16 @@ class PcapDissector
 
         String destinationIP = FormatUtils.ip(ip.destination());
 
-        separateIngoingOutgoing(sourceIP, destinationIP);
-
         getDestinationAddress(sourceIP, destinationIP);
     }
 
-    public static void separateIngoingOutgoing(String sourceAddress, String destinationAddress)
+    public static void separateIngoingOutgoing(String sourceMac, String destinationMac)
     {
-
-        if (sourceAddress.equalsIgnoreCase(localhost))
+        if (sourceMac.equalsIgnoreCase(macAddress))
         {
             numberOfPacketsSent++;
         }
-        else if (destinationAddress.equalsIgnoreCase(localhost))
+        else if (destinationMac.equalsIgnoreCase(macAddress))
         {
             numberOfPacketsReceived++;
         }
@@ -281,7 +341,7 @@ class PcapDissector
 
     static void getDestinationAddress(String sourceIP, String destinationIP)
     {
-        if (sourceIP.equals(localhost))
+        if (sourceIP.equals(macAddress))
         {
             ipAddressesVisited.add(destinationIP);
         }
@@ -335,8 +395,10 @@ class PcapDissector
     static void printTrafficStatistics()
     {
         writer.printf("%-46s %s %d \n", "Total number of packets in pcap", ": ", numberOfPackets);
-        writer.printf("%-33s %-6s %s %d %s %.2f %s \n", "Number of packets sent from", localhost, ": ", numberOfPacketsSent, " ", ((float) numberOfPacketsSent / numberOfPackets) * 100, "%");
-        writer.printf("%-33s %-6s %s %d %s %.2f %s \n", "Number of packets received from", localhost, ": ", numberOfPacketsReceived, " ", ((float) numberOfPacketsReceived / numberOfPackets) * 100, "%");
+        writer.printf("%-33s %-6s %s %d %s %.2f %s \n", "Number of packets sent from", macAddress, ": ", numberOfPacketsSent, " ", ((float) numberOfPacketsSent / numberOfPackets) * 100, "%");
+        writer.printf("%-33s %-6s %s %d %s %.2f %s \n", "Number of packets sent to", macAddress, ": ", numberOfPacketsReceived, " ", ((float) numberOfPacketsReceived / numberOfPackets) * 100, "%");
+        writer.printf("%-45s  %s %d \n", "ARP packets", ": ", numberOfARP);
+
         writer.printf("%-45s  %s %d \n", "TCP packets", ": ", numberOfTcpPackets);
         writer.printf("%-45s  %s %d \n", "SSL/TLS packets", ": ", numberOfSslTls);
 
