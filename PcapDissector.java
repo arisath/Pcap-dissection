@@ -4,11 +4,13 @@ import org.jnetpcap.packet.PcapPacketHandler;
 import org.jnetpcap.packet.format.FormatUtils;
 import org.jnetpcap.protocol.application.WebImage;
 import org.jnetpcap.protocol.lan.Ethernet;
+import org.jnetpcap.protocol.network.Icmp;
 import org.jnetpcap.protocol.network.Ip4;
 import org.jnetpcap.protocol.network.Ip6;
 import org.jnetpcap.protocol.tcpip.Http;
 import org.jnetpcap.protocol.tcpip.Tcp;
 import org.jnetpcap.protocol.tcpip.Udp;
+
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -22,24 +24,27 @@ import java.util.TreeSet;
 
 class PcapDissection
 {
+    static String pcapName;
+
     static final Ethernet ethernet = new Ethernet();
     static final Http http = new Http();
     static final Tcp tcp = new Tcp();
     static final Udp udp = new Udp();
     static final Ip4 ip = new Ip4();
+    static final Icmp icmp = new Icmp();
     static final Ip6 ip6 = new Ip6();
     static final WebImage webimage = new WebImage();
 
-    static int numberOfPacketsSent = 0;
-    static int numberOfPacketsReceived = 0;
-    static int numberOfPackets = 0;
+    static int numberOfPacketsSent;
+    static int numberOfPacketsReceived;
+    static int numberOfPackets;
 
-    static int numberOfEthernetPackets = 0;
-    static int numberOfARP = 0;
+    static int numberOfARPpackets;
+    static int numberOfICMPpackets;
 
-    static int numberOfIPpackets = 0;
+    static int numberOfIPpackets;
 
-    static int numberOfTcpPackets = 0;
+    static int numberOfTcpPackets;
     static int numberOfSYN;
     static int numberOfSYNACK;
     static int numberOfACK;
@@ -49,18 +54,19 @@ class PcapDissection
     static int numberOfRST;
 
     static int numberOfSslTls;
-    static int numberOfUdpPackets = 0;
+    static int numberOfUdpPackets;
     static int numberOfDNS;
 
-    static int numberOfHTTPpackets = 0;
-    static int numberOfGETS = 0;
-    static int numberOfPosts = 0;
-    static int numberOfImages = 0;
+    static int numberOfHTTPpackets;
+    static int numberOfGETS;
+    static int numberOfPosts;
+    static int numberOfImages;
 
     static String macAddress = "";
 
     static HashSet<String> ipAddressesVisited = new HashSet<String>();
-    static TreeSet<Integer> portsUsed = new TreeSet<>();
+    static TreeSet<Integer> clientPortsUsed = new TreeSet<Integer>();
+    static TreeSet<Integer> serversPortsUsed = new TreeSet<Integer>();
     static HashMap<String, Integer> imageTypes = new HashMap<String, Integer>();
 
 
@@ -75,7 +81,7 @@ class PcapDissection
 
             writer = new PrintWriter("Report.txt", "UTF-8");
 
-            String pcapName = "InsertPcapNameHere.pcap";
+            pcapName = "fooo.pcap";
 
             StringBuilder errbuf = new StringBuilder();
 
@@ -102,7 +108,11 @@ class PcapDissection
                         {
                             processIPheader();
 
-                            if (packet.hasHeader(tcp))
+                            if (packet.hasHeader(icmp))
+                            {
+                                numberOfICMPpackets++;
+                            }
+                            else if (packet.hasHeader(tcp))
                             {
                                 processTCPheader();
                             }
@@ -131,7 +141,8 @@ class PcapDissection
             pcap.close();
 
             printTrafficStatistics();
-            printPortsUsed(portsUsed);
+            printPortsUsed("Servers'  ", serversPortsUsed);
+            printPortsUsed("Client's ", clientPortsUsed);
             printIPaddressesVisited(ipAddressesVisited);
             printTCPflagsStatistics();
             printImageTypes();
@@ -192,13 +203,14 @@ class PcapDissection
     {
         if ((new String(FormatUtils.hexdump(ethernet.getHeader())).substring(45, 50)).equals("08 06"))
         {
-            numberOfARP++;
+            numberOfARPpackets++;
         }
         String sourceMac = FormatUtils.mac(ethernet.source());
 
         String destinationMac = FormatUtils.mac(ethernet.destination());
 
         separateIngoingOutgoing(sourceMac, destinationMac);
+
     }
 
     /**
@@ -208,11 +220,11 @@ class PcapDissection
     {
         numberOfIPpackets++;
 
-        String sourceIP = FormatUtils.ip(ip.source());
+        String sourceMac = FormatUtils.mac(ethernet.source());
 
         String destinationIP = FormatUtils.ip(ip.destination());
 
-        getDestinationAddress(sourceIP, destinationIP);
+        getDestinationAddress(sourceMac, destinationIP);
     }
 
     /**
@@ -245,9 +257,7 @@ class PcapDissection
 
         int dport = tcp.destination();
 
-        portsUsed.add(sport);
-
-        portsUsed.add(dport);
+        addPorts(sport, dport);
 
         processTCPflags();
 
@@ -310,6 +320,34 @@ class PcapDissection
     }
 
     /**
+     * Adds the source and destination ports to the appropriate
+     * Treeset based on the source and destination mac addresses
+     * of the packet
+     *
+     * @param sport
+     * @param dport
+     */
+    static void addPorts(int sport, int dport)
+    {
+        String sourceMac = FormatUtils.mac(ethernet.source());
+
+        String destinationMac = FormatUtils.mac(ethernet.destination());
+
+        if (sourceMac.equals(macAddress))
+        {
+            clientPortsUsed.add(sport);
+
+            serversPortsUsed.add(dport);
+        }
+        else if (destinationMac.equals(macAddress))
+        {
+            clientPortsUsed.add(dport);
+            
+            serversPortsUsed.add(sport);
+        }
+    }
+
+    /**
      * Processes the UDP header of this packet
      */
     static void processUDPheader()
@@ -320,9 +358,7 @@ class PcapDissection
 
         int dport = udp.destination();
 
-        portsUsed.add(sport);
-
-        portsUsed.add(dport);
+        addPorts(sport, dport);
 
         processPorts(sport, dport);
     }
@@ -398,11 +434,11 @@ class PcapDissection
      *
      * @param portsUsed
      */
-    static void printPortsUsed(TreeSet<Integer> portsUsed)
+    static void printPortsUsed(String machine, TreeSet<Integer> portsUsed)
     {
         writer.println();
 
-        writer.println("Ports utilised:");
+        writer.println(machine + " ports utilised:");
 
         int i = 0;
 
@@ -410,7 +446,7 @@ class PcapDissection
         {
             i++;
 
-            writer.printf("%5d %s", port, " ");
+            writer.printf("%5d  ", port);
 
             if (i % 18 == 0)
             {
@@ -437,7 +473,7 @@ class PcapDissection
         {
             i++;
 
-            writer.printf("%-16s %s", ip, " ");
+            writer.printf("%-16s  ", ip);
 
             if (i % 7 == 0)
             {
@@ -454,19 +490,20 @@ class PcapDissection
      */
     static void printTrafficStatistics()
     {
-        writer.printf("%-46s %s %d \n", "Total number of packets in pcap", ": ", numberOfPackets);
-        writer.printf("%-33s %-6s %s %d %s %.2f %s \n", "Number of packets sent from", macAddress, ": ", numberOfPacketsSent, " ", ((float) numberOfPacketsSent / numberOfPackets) * 100, "%");
-        writer.printf("%-33s %-6s %s %d %s %.2f %s \n", "Number of packets sent to", macAddress, ": ", numberOfPacketsReceived, " ", ((float) numberOfPacketsReceived / numberOfPackets) * 100, "%");
-        writer.printf("%-45s  %s %d \n", "ARP packets", ": ", numberOfARP);
+        writer.printf("Report for " + pcapName + "\n\n");
+        writer.printf("%-46s %s %8d \n", "Total number of packets in pcap", ": ", numberOfPackets);
+        writer.printf("%-27s %-18s %s %8d %s %.2f %s \n", "Number of packets sent from", macAddress, ": ", numberOfPacketsSent, " ", ((float) numberOfPacketsSent / numberOfPackets) * 100, "%");
+        writer.printf("%-27s %-18s %s %8d %s %.2f %s \n", "Number of packets sent to", macAddress, ": ", numberOfPacketsReceived, " ", ((float) numberOfPacketsReceived / numberOfPackets) * 100, "%");
+        writer.printf("%-45s  %s %8d \n", "ARP packets", ": ", numberOfARPpackets);
 
-        writer.printf("%-45s  %s %d \n", "TCP packets", ": ", numberOfTcpPackets);
-        writer.printf("%-45s  %s %d \n", "SSL/TLS packets", ": ", numberOfSslTls);
+        writer.printf("%-45s  %s %8d \n", "TCP packets", ": ", numberOfTcpPackets);
+        writer.printf("%-45s  %s %8d \n", "SSL/TLS packets", ": ", numberOfSslTls);
 
-        writer.printf("%-45s  %s %d \n", "UDP packets", ": ", numberOfUdpPackets);
-        writer.printf("%-45s  %s %d \n", "DNS packets", ": ", numberOfDNS);
-        writer.printf("%-45s  %s %d \n", "HTTP packets", ": ", numberOfHTTPpackets);
-        writer.printf("%-45s  %s %d \n", "Number of  GET requests", ": ", numberOfGETS);
-        writer.printf("%-45s  %s %d \n", "Number of POST requests", ": ", numberOfPosts);
+        writer.printf("%-45s  %s %8d \n", "UDP packets", ": ", numberOfUdpPackets);
+        writer.printf("%-45s  %s %8d \n", "DNS packets", ": ", numberOfDNS);
+        writer.printf("%-45s  %s %8d \n", "HTTP packets", ": ", numberOfHTTPpackets);
+        writer.printf("%-45s  %s %8d \n", "Number of  GET requests", ": ", numberOfGETS);
+        writer.printf("%-45s  %s %8d \n", "Number of POST requests", ": ", numberOfPosts);
     }
 
     /**
