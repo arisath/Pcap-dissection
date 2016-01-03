@@ -381,6 +381,7 @@ class PcapDissection
 
     /**
      * Processes images transferred over HTTP
+     * Images transferred over SSL/TLS will not be processed
      */
     static void processImage()
     {
@@ -406,7 +407,7 @@ class PcapDissection
      */
     static void printImageTypes()
     {
-        writer.printf("%s %d %s \n", "Found ", numberOfImages, " images:");
+        writer.printf("%s %d %s \n", "Found ", numberOfImages, " images (Images transferred over SSL/TLS are not included) :");
 
         for (Map.Entry entry : imageTypes.entrySet())
         {
