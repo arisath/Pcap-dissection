@@ -10,7 +10,6 @@ import org.jnetpcap.protocol.network.Ip6;
 import org.jnetpcap.protocol.tcpip.Http;
 import org.jnetpcap.protocol.tcpip.Tcp;
 import org.jnetpcap.protocol.tcpip.Udp;
-
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
