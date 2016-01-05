@@ -1,3 +1,4 @@
+import org.apache.commons.net.whois.WhoisClient;
 import org.jnetpcap.Pcap;
 import org.jnetpcap.packet.PcapPacket;
 import org.jnetpcap.packet.PcapPacketHandler;
@@ -10,19 +11,20 @@ import org.jnetpcap.protocol.network.Ip6;
 import org.jnetpcap.protocol.tcpip.Http;
 import org.jnetpcap.protocol.tcpip.Tcp;
 import org.jnetpcap.protocol.tcpip.Udp;
+
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.TreeSet;
 
 
 class PcapDissection
 {
+    static Pcap pcap;
     static String pcapName;
 
     static final Ethernet ethernet = new Ethernet();
@@ -63,10 +65,11 @@ class PcapDissection
 
     static String macAddress = "";
 
-    static HashSet<String> ipAddressesVisited = new HashSet<String>();
+    static HashMap<String, String> ipAddressesVisited = new HashMap<String, String>();
     static TreeSet<Integer> clientPortsUsed = new TreeSet<Integer>();
     static TreeSet<Integer> serversPortsUsed = new TreeSet<Integer>();
     static HashMap<String, Integer> imageTypes = new HashMap<String, Integer>();
+
 
     static PrintWriter writer;
 
@@ -79,11 +82,11 @@ class PcapDissection
 
             writer = new PrintWriter("Report.txt", "UTF-8");
 
-            pcapName = "fooo.pcap";
+            pcapName = "InsertPcapNameHere.pcap";
 
             StringBuilder errbuf = new StringBuilder();
 
-            Pcap pcap = Pcap.openOffline(pcapName, errbuf);
+             pcap = Pcap.openOffline(pcapName, errbuf);
 
             if (pcap == null)
             {
@@ -136,14 +139,14 @@ class PcapDissection
             };
 
             pcap.loop(Pcap.LOOP_INFINITE, jpacketHandler, " *");
-            pcap.close();
 
             printTrafficStatistics();
-            printPortsUsed("Servers'  ", serversPortsUsed);
-            printPortsUsed("Client's ", clientPortsUsed);
-            printIPaddressesVisited(ipAddressesVisited);
             printTCPflagsStatistics();
             printImageTypes();
+            printPortsUsed("Servers' ", serversPortsUsed);
+            printPortsUsed("Client's ", clientPortsUsed);
+            resolveIPaddresses(ipAddressesVisited);
+            printIPaddressesVisited(ipAddressesVisited);
 
         }
         catch (Exception e)
@@ -152,6 +155,7 @@ class PcapDissection
         }
         finally
         {
+            pcap.close();
             writer.close();
         }
 
@@ -340,7 +344,7 @@ class PcapDissection
         else if (destinationMac.equals(macAddress))
         {
             clientPortsUsed.add(dport);
-            
+
             serversPortsUsed.add(sport);
         }
     }
@@ -380,7 +384,7 @@ class PcapDissection
 
     /**
      * Processes images transferred over HTTP
-     * Images transferred over SSL/TLS will not be processed
+     * Images transferred over SSL/TLS are not processed
      */
     static void processImage()
     {
@@ -406,7 +410,7 @@ class PcapDissection
      */
     static void printImageTypes()
     {
-        writer.printf("%s %d %s \n", "Found ", numberOfImages, " images (Images transferred over SSL/TLS are not included) :");
+        writer.printf("%s %d %s \n", "Found ", numberOfImages, " images (images transferred over SSL/TLS not included):");
 
         for (Map.Entry entry : imageTypes.entrySet())
         {
@@ -415,16 +419,23 @@ class PcapDissection
     }
 
     /**
-     * Adds the IP destination address to list of IP addresses visited
+     * Adds the IP destination address to the Map of IP addresses visited
      *
      * @param sourceMac
      * @param destinationIP
      */
     static void getDestinationAddress(String sourceMac, String destinationIP)
     {
-        if (sourceMac.equals(macAddress))
+        try
         {
-            ipAddressesVisited.add(destinationIP);
+            if (sourceMac.equals(macAddress))
+            {
+                ipAddressesVisited.put(destinationIP, "");
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
 
@@ -445,7 +456,7 @@ class PcapDissection
         {
             i++;
 
-            writer.printf("%5d  ", port);
+            writer.printf("%d  ", port);
 
             if (i % 18 == 0)
             {
@@ -456,31 +467,150 @@ class PcapDissection
     }
 
     /**
-     * Prints the IP addresses that were visited
+     * Prints the IP addresses that were visited along with their netnames
      *
      * @param ipAddressesVisited
      */
-    static void printIPaddressesVisited(HashSet<String> ipAddressesVisited)
+    static void printIPaddressesVisited(HashMap<String, String> ipAddressesVisited) throws Exception
     {
         writer.println();
 
         writer.println("IP addresses visited:");
 
-        int i = 0;
-
-        for (String ip : ipAddressesVisited)
+        for (Map.Entry entry : ipAddressesVisited.entrySet())
         {
-            i++;
+            writer.printf("%-17s", entry.getKey());
 
-            writer.printf("%-16s  ", ip);
-
-            if (i % 7 == 0)
-            {
-                writer.println();
-            }
+            writer.print(": " + entry.getValue() + "\n");
         }
 
         writer.println();
+    }
+
+    /**
+     * Resolves the IP addresses of the input Map and assigns the netname
+     * as the value of each entry
+     * @param ipAddressesVisited
+     * @throws Exception
+     */
+    static void resolveIPaddresses(HashMap<String, String> ipAddressesVisited) throws Exception
+    {
+        for (Map.Entry entry : ipAddressesVisited.entrySet())
+        {
+            String ip = entry.getKey().toString();
+
+            String netname = resolveNetname(ip);
+
+            entry.setValue(netname);
+        }
+    }
+
+    /**
+     * Resolves the netname of the input IP address using the WhoIs Protocol
+     * The first WhoIs server queried is whois.iana.org
+     * @param IPaddress the IP address to be resolved
+     * @return
+     * @throws Exception
+     */
+    static String resolveNetname(String IPaddress) throws Exception
+    {
+        try
+        {
+            if (IPaddress.startsWith("192.168.") || (IPaddress.startsWith("10.")))
+            {
+                return "Local Address";
+            }
+
+            String netname = "";
+
+            WhoisClient whoisClient = new WhoisClient();
+
+            whoisClient.connect("whois.iana.org", 43);
+
+            String queryResult = whoisClient.query(IPaddress);
+
+            whoisClient.disconnect();
+
+            String[] s = queryResult.split("\n");
+
+            String serverToQuery = "";
+
+            for (int i = 0; i < s.length; i++)
+            {
+                if (s[i].contains("whois:"))
+                {
+                    serverToQuery = s[i].substring(14);
+
+                    break;
+                }
+            }
+
+            String actualServer = serverToQuery;
+
+            String tld = IPaddress.substring(IPaddress.lastIndexOf(".") + 1).trim().toLowerCase();
+
+            whoisClient.connect(actualServer, 43);
+
+            if (tld.equals("com"))
+            {
+                queryResult = whoisClient.query("domain " + IPaddress);
+            }
+            else
+            {
+                queryResult = whoisClient.query(IPaddress);
+            }
+
+            whoisClient.disconnect();
+
+            String[] reply = queryResult.split("\n");
+
+            for (int i = 0; i < reply.length; i++)
+            {
+                if(reply[i].startsWith("%"))
+                {
+                    continue;
+                }
+                if (reply[i].startsWith("NetName"))
+                {
+                    netname = reply[i].substring(16);
+                    break;
+                }
+                else if (reply[i].startsWith("netname"))
+                {
+                    netname = reply[i].substring(16);
+                    break;
+                }
+                else if (reply[i].startsWith("status"))
+                {
+                    netname = reply[i].substring(16);
+                    break;
+                }
+                else if (reply[i].startsWith("Organization"))
+                {
+                    netname = reply[i].substring(16);
+                    break;
+                }
+                if (reply[i].startsWith("OrgName"))
+                {
+                    netname = reply[i].substring(16);
+                    break;
+                }
+            }
+
+            if (!netname.equals(""))
+            {
+                return netname;
+            }
+            else
+            {
+                return "Not resolved";
+            }
+
+        }
+        catch (Exception e)
+        {
+            return "Not resolved";
+        }
     }
 
     /**
