@@ -36,10 +36,10 @@ class PcapDissection
     static final Ip6 ip6 = new Ip6();
     static final WebImage webimage = new WebImage();
 
+    static int numberOfPackets;
     static int numberOfPacketsSent;
     static int numberOfPacketsReceived;
-    static int numberOfPackets;
-
+    
     static int numberOfARPpackets;
     static int numberOfICMPpackets;
 
