@@ -70,7 +70,6 @@ class PcapDissection
     static TreeSet<Integer> serversPortsUsed = new TreeSet<Integer>();
     static HashMap<String, Integer> imageTypes = new HashMap<String, Integer>();
 
-
     static PrintWriter writer;
 
     public static void main(String[] args)
