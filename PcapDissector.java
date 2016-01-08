@@ -63,12 +63,12 @@ class PcapDissection
     static int numberOfPosts;
     static int numberOfImages;
 
-    static String macAddress = "";
-
     static HashMap<String, String> ipAddressesVisited = new HashMap<String, String>();
     static TreeSet<Integer> clientPortsUsed = new TreeSet<Integer>();
     static TreeSet<Integer> serversPortsUsed = new TreeSet<Integer>();
     static HashMap<String, Integer> imageTypes = new HashMap<String, Integer>();
+
+    static String macAddress = "";
 
     static PrintWriter writer;
 
