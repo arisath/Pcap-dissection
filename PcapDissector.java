@@ -74,7 +74,6 @@ class PcapDissection
 
     public static void main(String[] args)
     {
-
         try
         {
             macAddress = getMacAddress();
