@@ -133,7 +133,6 @@ class PcapDissection
                         }
                     }
                 }
-
             };
 
             pcap.loop(Pcap.LOOP_INFINITE, jpacketHandler, " *");
