@@ -1,6 +1,8 @@
 # Pcap-dissection
 
 Pcap dissector implemented in Java using jnetpcap (http://jnetpcap.com/)
+[![Clojars Project](https://img.shields.io/clojars/v/clj-net-pcap.svg)](http://clojars.org/clj-net-pcap)
+
 
 **Metrics computed include:**
 * Number of packets sent/received
