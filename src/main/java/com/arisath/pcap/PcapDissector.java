@@ -1,3 +1,5 @@
+package com.arisath.pcap;
+
 import org.apache.commons.net.whois.WhoisClient;
 import org.jnetpcap.Pcap;
 import org.jnetpcap.packet.PcapPacket;
@@ -544,7 +546,7 @@ class PcapDissection
 
             String actualServer = serverToQuery;
 
-            String tld = IPaddress.substring(IPaddress.lastIndexOf(".") + 1).trim().toLowerCase();
+            String tld = IPaddress.substring(IPaddress.lastIndexOf("") + 1).trim().toLowerCase();
 
             whoisClient.connect(actualServer, 43);
 
