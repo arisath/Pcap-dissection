@@ -1,7 +1,7 @@
 # Pcap-dissection
 Pcap dissector implemented in Java using jnetpcap (http://jnetpcap.com/)
 
-[![GitHub stars](https://img.shields.io/github/stars/arisath/Pcap-dissection?style=social&label=Star&maxAge=2592000)](https://GitHub.com/arisath//Pcap-dissection)
+
 
 
 ## Metrics computed include:
