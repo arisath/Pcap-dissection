@@ -4,7 +4,7 @@ Pcap dissector implemented in Java using jnetpcap (http://jnetpcap.com/)
 [![Jnet Pcap](https://img.shields.io/clojars/v/clj-net-pcap.svg)](https://sourceforge.net/projects/jnetpcap/)
 
 
-**Metrics computed include:**
+##**Metrics computed include:**
 * Number of packets sent/received
 * HTTP packets
 * Number of GET requests
