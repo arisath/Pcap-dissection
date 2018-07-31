@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.TreeSet;
 
 
-class PcapDissection
+public class PcapDissection
 {
     static Pcap pcap;
     static String pcapName;
