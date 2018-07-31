@@ -1,7 +1,7 @@
 # Pcap-dissection
 Pcap dissector implemented in Java using jnetpcap (http://jnetpcap.com/)
 
-[![Jnet Pcap](https://img.shields.io/clojars/v/clj-net-pcap.svg)](https://sourceforge.net/projects/jnetpcap/)
+[![Jnet Pcap](	https://img.shields.io/github/stars/badges/shields.svg?style=social&label=Stars](https://sourceforge.net/projects/jnetpcap/)
 
 
 ## Metrics computed include:
