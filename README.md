@@ -1,7 +1,7 @@
 # Pcap-dissection
 Pcap dissector implemented in Java using jnetpcap (http://jnetpcap.com/)
 
-[![Generic badge](https://img.shields.io/badge/<WIRESHARK>-<PCAP>-<COLOR>.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/WIRESHARK-<PCAP>-<COLOR>.svg)](https://shields.io/)
 ![star this repo](http://githubbadges.com/star.svg?user=arisath&repo=Pcap-dissection)
 
 ## Metrics computed include:
