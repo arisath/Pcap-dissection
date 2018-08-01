@@ -2,7 +2,7 @@
 Pcap dissector implemented in Java using jnetpcap (http://jnetpcap.com/)
 
 [![Generic badge](https://img.shields.io/badge/<WIRESHARK>-<PCAP>-<COLOR>.svg)](https://shields.io/)
-![star this repo](http://githubbadges.com/star.svg?user=arisath&repo=Pcap-dissection)](http://github.com/ddavison/github-badges)
+![star this repo](http://githubbadges.com/star.svg?user=arisath&repo=Pcap-dissection)]
 
 ## Metrics computed include:
 * Number of packets sent/received
