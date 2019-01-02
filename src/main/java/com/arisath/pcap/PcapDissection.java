@@ -554,7 +554,7 @@ public class PcapDissection
 
             String actualServer = serverToQuery;
 
-            String tld = IPaddress.substring(IPaddress.lastIndexOf("") + 1).trim().toLowerCase();
+            String tld = IPaddress.substring(IPaddress.lastIndexOf("")).trim().toLowerCase();
 
             whoisClient.connect(actualServer, 43);
 
@@ -613,6 +613,10 @@ public class PcapDissection
                 return "Not resolved";
             }
 
+        }
+        catch (IndexOutOfBoundsException e)
+        {
+            return "Error parsing WhoIs response";
         }
         catch (Exception e)
         {
