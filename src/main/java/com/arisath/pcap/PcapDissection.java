@@ -14,6 +14,9 @@ import org.jnetpcap.protocol.tcpip.Http;
 import org.jnetpcap.protocol.tcpip.Tcp;
 import org.jnetpcap.protocol.tcpip.Udp;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -21,6 +24,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.TreeSet;
 
 
@@ -82,7 +86,9 @@ public class PcapDissection
 
             writer = new PrintWriter("Report.txt", "UTF-8");
 
-            pcapName = "InsertPcapNameHere.pcap";
+           Properties prop = Utils.loadPropertiesFile("config.properties");
+
+            pcapName = prop.getProperty("pcapPath");
 
             StringBuilder errbuf = new StringBuilder();
 
@@ -159,6 +165,8 @@ public class PcapDissection
         }
 
     }
+
+
 
     /**
      * Returns the MAC address of the current machine in 00:00:00:00:00:00 format
