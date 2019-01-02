@@ -523,7 +523,7 @@ public class PcapDissection
     {
         try
         {
-            if (IPaddress.startsWith("192.168.") || (IPaddress.startsWith("10.")))
+            if (IPaddress.startsWith("192.168.") || (IPaddress.startsWith("10.")) || (IPaddress.startsWith("172.16")))
             {
                 return "Local Address";
             }
