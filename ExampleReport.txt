@@ -21,6 +21,13 @@ FIN PSH ACK  :        54  0.50 %
 FIN ACK      :       411  3.77 % 
 RST          :        12  0.11 % 
 
+HTTP Responses distribution:
+200 OK       :       210 79.85 % 
+204 No       :         3  1.14 % 
+302 Found    :         1  0.38 % 
+304 Not      :        14  5.32 % 
+400 Bad      :        35 13.31 % 
+
 Found  163  images (images transferred over SSL/TLS not included): 
 GIF    3 
 PNG    39 
