@@ -9,6 +9,7 @@ Pcap dissector implemented in Java using jnetpcap (http://jnetpcap.com/)
 * HTTP packets
 * Number of GET requests
 * Number of POST requests
+* Distribution of HTTP responses
 * Images downloaded
 * DNS packets
 * TCP packets
