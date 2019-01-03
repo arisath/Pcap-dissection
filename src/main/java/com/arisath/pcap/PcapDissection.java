@@ -395,7 +395,11 @@ public class PcapDissection
     static void processHTTPResponse()
     {
 
-        String httpResponse = http.fieldValue(Http.Response.ResponseCode);
+        String httpResponseCode = http.fieldValue(Http.Response.ResponseCode);
+
+        String httpResponseMsg = http.fieldValue(Http.Response.ResponseCodeMsg);
+
+       String httpResponse = httpResponseCode +" "+httpResponseMsg;
 
         if(httpResponse!=null)
         {
@@ -671,7 +675,7 @@ public class PcapDissection
     }
 
     /**
-     * Prints the distributions among different TCP flags
+     * Prints the distribution among different TCP flags
      * TCP Flags include: [SYN], [SYN ACK], [ACK], [PSH ACK]
      * [FIN PSH ACK], [FIN ACK], [RST]
      */
@@ -689,10 +693,15 @@ public class PcapDissection
         writer.println();
     }
 
+    /**
+     * Prints the distribution among different HTTP responses
+     */
     static void printHTTPResponseStatistics()
     {
         int httpResponsesSum=0;
-        for (int value : httpResponses.values()) {
+
+        for (int value : httpResponses.values())
+        {
             httpResponsesSum += value;
         }
 
@@ -708,9 +717,8 @@ public class PcapDissection
         for (Map.Entry entry : sortedHTTPResponses)
         {
             int value = (Integer) entry.getValue();
-            
-            writer.printf("%-12s %s %8d %5.2f %s \n", entry.getKey(),": ",value,  ((float) value) / httpResponsesSum * 100, "%");
 
+            writer.printf("%-12s %s %8d %5.2f %s \n", entry.getKey(),": ",value,  ((float) value) / httpResponsesSum * 100, "%");
         }
 
         writer.println();
