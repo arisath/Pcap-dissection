@@ -70,6 +70,8 @@ public class PcapDissection
     static HashMap<String, Integer> imageTypes = new HashMap<String, Integer>();
     static HashMap<String, Integer> httpResponses = new HashMap<String, Integer>();
     static HashMap<String, Integer> httpServers = new HashMap<String, Integer>();
+    static HashMap<String, Integer> httpReferers = new HashMap<String, Integer>();
+
 
 
     static String macAddress = "";
@@ -393,6 +395,10 @@ public class PcapDissection
             processHTTPResponse();
             processHTTPServers();
         }
+        else
+        {
+            processHTTPReferers();
+        }
     }
 
     /**
@@ -446,6 +452,29 @@ public class PcapDissection
         }
     }
 
+    /*
+     * Processes the HTTP server of this packet
+     */
+    static void processHTTPReferers()
+    {
+        String httpReferer = http.fieldValue(Http.Request.Referer);
+
+        if(httpReferer!=null)
+        {
+            String refererHostname = Utils.extractFQDNFromUri(httpReferer);
+
+            Integer count = httpReferers.get(refererHostname);
+
+            if (count == null)
+            {
+                httpReferers.put(refererHostname, 1);
+            }
+            else
+            {
+                httpReferers.put(refererHostname, count + 1);
+            }
+        }
+    }
 
     /**
      * Processes images transferred over HTTP

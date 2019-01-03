@@ -2,6 +2,8 @@ package com.arisath.pcap;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -49,6 +51,21 @@ public class Utils
             return "Microsoft-IIS";
         }
         return  fullServerName;
+    }
+
+    static String extractFQDNFromUri(String url)
+    {
+        try
+        {
+            URL aURL = new URL(url);
+
+            return aURL.getHost().toString();
+        }
+        catch (MalformedURLException malformedUrlException)
+        {
+            System.out.println("URL is malformed");
+        }
+        return null;
     }
 
     /**
