@@ -7,6 +7,7 @@ Pcap dissector implemented in Java using jnetpcap (http://jnetpcap.com/)
 
 ### Prerequisites
 ```
+WinPcap/libpcap
 Maven
 Java 8+
 ```
