@@ -4,6 +4,24 @@ Pcap dissector implemented in Java using jnetpcap (http://jnetpcap.com/)
 [![Generic badge](https://img.shields.io/badge/WIRESHARK-PCAP-<COLOR>.svg)](https://shields.io/)
 ![star this repo](http://githubbadges.com/star.svg?user=arisath&repo=Pcap-dissection)
 
+
+### Prerequisites
+
+Maven
+Java 8+
+```
+Maven
+Java 8+
+```
+
+### Installing
+
+
+```
+mvn clean install
+```
+
+
 ## Metrics computed include:
 * Number of packets sent/received
 * HTTP packets
