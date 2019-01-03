@@ -149,6 +149,7 @@ public class PcapDissection
             printTCPflagsStatistics();
             Utils.printHTTPResponseStatistics(httpResponses);
             Utils.printHTTPServers(httpServers);
+            Utils.printHTTPReferersStatistics(httpReferers);
             printImageTypes();
             printPortsUsed("Servers' ", serversPortsUsed);
             printPortsUsed("Client's ", clientPortsUsed);

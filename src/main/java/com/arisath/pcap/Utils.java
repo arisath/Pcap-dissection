@@ -130,4 +130,35 @@ public class Utils
         PcapDissection.writer.println();
     }
 
+    /**
+     * Prints the distribution among different HTTP referers
+     */
+    static void printHTTPReferersStatistics(HashMap<String,Integer> httpReferers)
+    {
+        int httpReferersSum=0;
+
+        for (int value : httpReferers.values())
+        {
+            httpReferersSum += value;
+        }
+
+        PcapDissection.writer.println();
+
+        PcapDissection.writer.println("HTTP Referers distribution:");
+
+        List<Map.Entry<String, Integer>> sortedhttpReferers =  httpReferers.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByKey())
+                .collect(Collectors.toList());
+
+        for (Map.Entry entry : sortedhttpReferers)
+        {
+            int value = (Integer) entry.getValue();
+
+            PcapDissection.writer.printf("%-55s %s %8d %5.2f %s \n", entry.getKey(),": ",value,  ((float) value) / httpReferersSum * 100, "%");
+        }
+
+        PcapDissection.writer.println();
+    }
+
 }
