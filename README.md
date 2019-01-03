@@ -24,6 +24,7 @@ mvn clean install
 * Number of GET requests
 * Number of POST requests
 * Distribution of HTTP responses
+* HTTP servers
 * Images downloaded
 * DNS packets
 * TCP packets
