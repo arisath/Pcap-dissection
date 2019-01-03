@@ -67,6 +67,7 @@ public class PcapDissection
     static TreeSet<Integer> clientPortsUsed = new TreeSet<Integer>();
     static TreeSet<Integer> serversPortsUsed = new TreeSet<Integer>();
     static HashMap<String, Integer> imageTypes = new HashMap<String, Integer>();
+    static HashMap<String, Integer> httpRequestTypes = new HashMap<String, Integer>();
     static HashMap<String, Integer> httpResponses = new HashMap<String, Integer>();
     static HashMap<String, Integer> httpServers = new HashMap<String, Integer>();
     static HashMap<String, Integer> httpReferers = new HashMap<String, Integer>();
@@ -149,11 +150,12 @@ public class PcapDissection
             Utils.printHTTPResponseStatistics(httpResponses);
             Utils.printHTTPServers(httpServers);
             Utils.printHTTPReferersStatistics(httpReferers);
+            Utils.printHTTPRequestTypes(httpRequestTypes);
             printImageTypes();
             printPortsUsed("Servers' ", serversPortsUsed);
             printPortsUsed("Client's ", clientPortsUsed);
-            resolveIPaddresses(ipAddressesVisited);
-            printIPaddressesVisited(ipAddressesVisited);
+          //  resolveIPaddresses(ipAddressesVisited);
+          //  printIPaddressesVisited(ipAddressesVisited);
 
         }
         catch (Exception e)
@@ -381,15 +383,6 @@ public class PcapDissection
     {
         numberOfHTTPpackets++;
 
-        if (http.header().contains("GET"))
-        {
-            numberOfGETS++;
-        }
-        else if (http.header().contains("POST"))
-        {
-            numberOfPosts++;
-        }
-
         if (http.isResponse())
         {
             processHTTPResponse();
@@ -397,17 +390,46 @@ public class PcapDissection
         }
         else
         {
+            if (http.header().contains("GET"))
+            {
+                numberOfGETS++;
+            }
+            else if (http.header().contains("POST"))
+            {
+                numberOfPosts++;
+            }
+
+            processHTTPRequestMethod();
             processHTTPUserAgents();
             processHTTPReferers();
         }
     }
 
     /**
-     * Processes the HTTP response of this packet
+     * Processes the HTTP request type of this packet
      */
+    static void processHTTPRequestMethod()
+    {
+        String requestMethod = http.fieldValue(Http.Request.RequestMethod);
+
+        Integer count = httpRequestTypes.get(requestMethod);
+
+        if (count == null)
+        {
+            httpRequestTypes.put(requestMethod, 1);
+        }
+        else
+        {
+            httpRequestTypes.put(requestMethod, count + 1);
+        }
+
+    }
+
+        /**
+         * Processes the HTTP response of this packet
+         */
     static void processHTTPResponse()
     {
-
         String httpResponseCode = http.fieldValue(Http.Response.ResponseCode);
 
         String httpResponseMsg = http.fieldValue(Http.Response.ResponseCodeMsg);
