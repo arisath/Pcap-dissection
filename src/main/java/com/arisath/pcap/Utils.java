@@ -33,4 +33,21 @@ public class Utils
         return null;
     }
 
+    static String sanitiseServerVersion(String fullServerName)
+    {
+        if(fullServerName.contains("nginx"))
+        {
+            return "nginx";
+        }
+        else if(fullServerName.contains("Apache"))
+        {
+            return "Apache";
+        }
+        else if(fullServerName.contains("Microsoft-IIS"))
+        {
+            return "Microsoft-IIS";
+        }
+        return  fullServerName;
+    }
+
 }

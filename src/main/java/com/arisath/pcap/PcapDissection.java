@@ -69,6 +69,7 @@ public class PcapDissection
     static TreeSet<Integer> serversPortsUsed = new TreeSet<Integer>();
     static HashMap<String, Integer> imageTypes = new HashMap<String, Integer>();
     static HashMap<String, Integer> httpResponses = new HashMap<String, Integer>();
+    static HashMap<String, Integer> httpServers = new HashMap<String, Integer>();
 
 
     static String macAddress = "";
@@ -145,6 +146,7 @@ public class PcapDissection
             printTrafficStatistics();
             printTCPflagsStatistics();
             printHTTPResponseStatistics();
+            printHTTPServers();
             printImageTypes();
             printPortsUsed("Servers' ", serversPortsUsed);
             printPortsUsed("Client's ", clientPortsUsed);
@@ -389,9 +391,13 @@ public class PcapDissection
         if (http.isResponse())
         {
             processHTTPResponse();
+            processHTTPServers();
         }
     }
 
+    /**
+     * Processes the HTTP response of this packet
+     */
     static void processHTTPResponse()
     {
 
@@ -399,7 +405,7 @@ public class PcapDissection
 
         String httpResponseMsg = http.fieldValue(Http.Response.ResponseCodeMsg);
 
-       String httpResponse = httpResponseCode +" "+httpResponseMsg;
+        String httpResponse = httpResponseCode +" "+httpResponseMsg;
 
         if(httpResponse!=null)
         {
@@ -414,8 +420,32 @@ public class PcapDissection
                 httpResponses.put(httpResponse, count + 1);
             }
         }
-
     }
+
+    /*
+     * Processes the HTTP server of this packet
+     */
+    static void processHTTPServers()
+    {
+        String httpServer = http.fieldValue(Http.Response.Server);
+
+        if(httpServer!=null)
+        {
+            String httpServerSanitised = Utils.sanitiseServerVersion(httpServer);
+
+            Integer count = httpServers.get(httpServerSanitised);
+
+            if (count == null)
+            {
+                httpServers.put(httpServerSanitised, 1);
+            }
+            else
+            {
+                httpServers.put(httpServerSanitised, count + 1);
+            }
+        }
+    }
+
 
     /**
      * Processes images transferred over HTTP
@@ -719,6 +749,37 @@ public class PcapDissection
             int value = (Integer) entry.getValue();
 
             writer.printf("%-12s %s %8d %5.2f %s \n", entry.getKey(),": ",value,  ((float) value) / httpResponsesSum * 100, "%");
+        }
+
+        writer.println();
+    }
+
+    /**
+     * Prints the distribution among different HTTP servers
+     */
+    static void printHTTPServers()
+    {
+        int httpServersSum=0;
+
+        for (int value : httpServers.values())
+        {
+            httpServersSum += value;
+        }
+
+        writer.println();
+
+        writer.println("HTTP Servers distribution:");
+
+        List<Map.Entry<String, Integer>> sortedHTTPServers =  httpServers.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .collect(Collectors.toList());
+
+        for (Map.Entry entry : sortedHTTPServers)
+        {
+            int value = (Integer) entry.getValue();
+
+            writer.printf("%-55s %s %8d %5.2f %s \n", entry.getKey(),": ",value,  ((float) value) / httpServersSum * 100, "%");
         }
 
         writer.println();
