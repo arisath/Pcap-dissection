@@ -2,7 +2,8 @@ package com.arisath.pcap;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Properties;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by BDC on 2/1/2019.
@@ -48,6 +49,68 @@ public class Utils
             return "Microsoft-IIS";
         }
         return  fullServerName;
+    }
+
+    /**
+     * Prints the distribution among different HTTP servers
+     */
+    static void printHTTPServers(HashMap<String,Integer> httpServers)
+    {
+        int httpServersSum=0;
+
+        for (int value : httpServers.values())
+        {
+            httpServersSum += value;
+        }
+
+        PcapDissection.writer.println();
+
+        PcapDissection.writer.println("HTTP Servers distribution:");
+
+        List<Map.Entry<String, Integer>> sortedHTTPServers =  httpServers.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .collect(Collectors.toList());
+
+        for (Map.Entry entry : sortedHTTPServers)
+        {
+            int value = (Integer) entry.getValue();
+
+            PcapDissection.writer.printf("%-55s %s %8d %5.2f %s \n", entry.getKey(),": ",value,  ((float) value) / httpServersSum * 100, "%");
+        }
+
+        PcapDissection.writer.println();
+    }
+
+    /**
+     * Prints the distribution among different HTTP responses
+     */
+    static void printHTTPResponseStatistics(HashMap<String,Integer> httpResponses)
+    {
+        int httpResponsesSum=0;
+
+        for (int value : httpResponses.values())
+        {
+            httpResponsesSum += value;
+        }
+
+        PcapDissection.writer.println();
+
+        PcapDissection.writer.println("HTTP Responses distribution:");
+
+        List<Map.Entry<String, Integer>> sortedHTTPResponses =  httpResponses.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByKey())
+                .collect(Collectors.toList());
+
+        for (Map.Entry entry : sortedHTTPResponses)
+        {
+            int value = (Integer) entry.getValue();
+
+            PcapDissection.writer.printf("%-12s %s %8d %5.2f %s \n", entry.getKey(),": ",value,  ((float) value) / httpResponsesSum * 100, "%");
+        }
+
+        PcapDissection.writer.println();
     }
 
 }

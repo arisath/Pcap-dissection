@@ -145,8 +145,8 @@ public class PcapDissection
 
             printTrafficStatistics();
             printTCPflagsStatistics();
-            printHTTPResponseStatistics();
-            printHTTPServers();
+            Utils.printHTTPResponseStatistics(httpResponses);
+            Utils.printHTTPServers(httpServers);
             printImageTypes();
             printPortsUsed("Servers' ", serversPortsUsed);
             printPortsUsed("Client's ", clientPortsUsed);
@@ -723,66 +723,8 @@ public class PcapDissection
         writer.println();
     }
 
-    /**
-     * Prints the distribution among different HTTP responses
-     */
-    static void printHTTPResponseStatistics()
-    {
-        int httpResponsesSum=0;
 
-        for (int value : httpResponses.values())
-        {
-            httpResponsesSum += value;
-        }
 
-        writer.println();
 
-        writer.println("HTTP Responses distribution:");
-
-        List<Map.Entry<String, Integer>> sortedHTTPResponses =  httpResponses.entrySet()
-               .stream()
-               .sorted(Map.Entry.comparingByKey())
-                .collect(Collectors.toList());
-
-        for (Map.Entry entry : sortedHTTPResponses)
-        {
-            int value = (Integer) entry.getValue();
-
-            writer.printf("%-12s %s %8d %5.2f %s \n", entry.getKey(),": ",value,  ((float) value) / httpResponsesSum * 100, "%");
-        }
-
-        writer.println();
-    }
-
-    /**
-     * Prints the distribution among different HTTP servers
-     */
-    static void printHTTPServers()
-    {
-        int httpServersSum=0;
-
-        for (int value : httpServers.values())
-        {
-            httpServersSum += value;
-        }
-
-        writer.println();
-
-        writer.println("HTTP Servers distribution:");
-
-        List<Map.Entry<String, Integer>> sortedHTTPServers =  httpServers.entrySet()
-                .stream()
-                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                .collect(Collectors.toList());
-
-        for (Map.Entry entry : sortedHTTPServers)
-        {
-            int value = (Integer) entry.getValue();
-
-            writer.printf("%-55s %s %8d %5.2f %s \n", entry.getKey(),": ",value,  ((float) value) / httpServersSum * 100, "%");
-        }
-
-        writer.println();
-    }
 }
 
