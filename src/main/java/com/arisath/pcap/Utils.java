@@ -161,4 +161,28 @@ public class Utils
         PcapDissection.writer.println();
     }
 
+    /**
+     * Prints the most prevalent HTTP user agent
+     */
+    static void printHTTPUserAgent(HashMap<String,Integer> httpUserAgents)
+    {
+        PcapDissection.writer.println();
+
+if (httpUserAgents.size()>0)
+{
+
+    List<Map.Entry<String, Integer>> sortedhttpReferers = httpUserAgents.entrySet()
+            .stream()
+            .sorted(Map.Entry.comparingByKey())
+            .collect(Collectors.toList());
+
+        PcapDissection.writer.println("The most prevalent user agent is: " + sortedhttpReferers.get(0));
+
+    PcapDissection.writer.println();
+}
+        else {
+    System.out.println("No user agent was identified");
+        }
+    }
+
 }

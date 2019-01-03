@@ -20,7 +20,6 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 public class PcapDissection
@@ -71,8 +70,7 @@ public class PcapDissection
     static HashMap<String, Integer> httpResponses = new HashMap<String, Integer>();
     static HashMap<String, Integer> httpServers = new HashMap<String, Integer>();
     static HashMap<String, Integer> httpReferers = new HashMap<String, Integer>();
-
-
+    static HashMap<String, Integer> httpUserAgents = new HashMap<String, Integer>();
 
     static String macAddress = "";
 
@@ -147,6 +145,7 @@ public class PcapDissection
 
             printTrafficStatistics();
             printTCPflagsStatistics();
+            Utils.printHTTPUserAgent(httpUserAgents);
             Utils.printHTTPResponseStatistics(httpResponses);
             Utils.printHTTPServers(httpServers);
             Utils.printHTTPReferersStatistics(httpReferers);
@@ -398,6 +397,7 @@ public class PcapDissection
         }
         else
         {
+            processHTTPUserAgents();
             processHTTPReferers();
         }
     }
@@ -473,6 +473,28 @@ public class PcapDissection
             else
             {
                 httpReferers.put(refererHostname, count + 1);
+            }
+        }
+    }
+
+
+    /*
+       * Processes the HTTP user agent of this packet
+       */
+    static void processHTTPUserAgents()
+    {
+        String httpUserAgent = http.fieldValue(Http.Request.User_Agent);
+        if(httpUserAgent!=null)
+        {
+            Integer count = httpReferers.get(httpUserAgent);
+
+            if (count == null)
+            {
+                httpUserAgents.put(httpUserAgent, 1);
+            }
+            else
+            {
+                httpUserAgents.put(httpUserAgent, count + 1);
             }
         }
     }
