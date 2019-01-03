@@ -14,18 +14,13 @@ import org.jnetpcap.protocol.tcpip.Http;
 import org.jnetpcap.protocol.tcpip.Tcp;
 import org.jnetpcap.protocol.tcpip.Udp;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.TreeSet;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 public class PcapDissection
@@ -73,6 +68,8 @@ public class PcapDissection
     static TreeSet<Integer> clientPortsUsed = new TreeSet<Integer>();
     static TreeSet<Integer> serversPortsUsed = new TreeSet<Integer>();
     static HashMap<String, Integer> imageTypes = new HashMap<String, Integer>();
+    static HashMap<String, Integer> httpResponses = new HashMap<String, Integer>();
+
 
     static String macAddress = "";
 
@@ -147,6 +144,7 @@ public class PcapDissection
 
             printTrafficStatistics();
             printTCPflagsStatistics();
+            printHTTPResponseStatistics();
             printImageTypes();
             printPortsUsed("Servers' ", serversPortsUsed);
             printPortsUsed("Client's ", clientPortsUsed);
@@ -387,6 +385,32 @@ public class PcapDissection
         {
             numberOfPosts++;
         }
+
+        if (http.isResponse())
+        {
+            processHTTPResponse();
+        }
+    }
+
+    static void processHTTPResponse()
+    {
+
+        String httpResponse = http.fieldValue(Http.Response.ResponseCode);
+
+        if(httpResponse!=null)
+        {
+            Integer count = httpResponses.get(httpResponse);
+
+            if (count == null)
+            {
+                httpResponses.put(httpResponse, 1);
+            }
+            else
+            {
+                httpResponses.put(httpResponse, count + 1);
+            }
+        }
+
     }
 
     /**
@@ -662,6 +686,33 @@ public class PcapDissection
         writer.printf("%-12s %s %8d %5.2f %s \n", "FIN PSH ACK", ": ", numberOfFINPSHACK, ((float) numberOfFINPSHACK) / numberOfTcpPackets * 100, "%");
         writer.printf("%-12s %s %8d %5.2f %s \n", "FIN ACK", ": ", numberOfFINACK, ((float) numberOfFINACK) / numberOfTcpPackets * 100, "%");
         writer.printf("%-12s %s %8d %5.2f %s \n", "RST", ": ", numberOfRST, ((float) numberOfRST) / numberOfTcpPackets * 100, "%");
+        writer.println();
+    }
+
+    static void printHTTPResponseStatistics()
+    {
+        int httpResponsesSum=0;
+        for (int value : httpResponses.values()) {
+            httpResponsesSum += value;
+        }
+
+        writer.println();
+
+        writer.println("HTTP Responses distribution:");
+
+        List<Map.Entry<String, Integer>> sortedHTTPResponses =  httpResponses.entrySet()
+               .stream()
+               .sorted(Map.Entry.comparingByKey())
+                .collect(Collectors.toList());
+
+        for (Map.Entry entry : sortedHTTPResponses)
+        {
+            int value = (Integer) entry.getValue();
+            
+            writer.printf("%-12s %s %8d %5.2f %s \n", entry.getKey(),": ",value,  ((float) value) / httpResponsesSum * 100, "%");
+
+        }
+
         writer.println();
     }
 }
