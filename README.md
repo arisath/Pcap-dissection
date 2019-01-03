@@ -6,17 +6,12 @@ Pcap dissector implemented in Java using jnetpcap (http://jnetpcap.com/)
 
 
 ### Prerequisites
-
-Maven
-Java 8+
 ```
 Maven
 Java 8+
 ```
 
 ### Installing
-
-
 ```
 mvn clean install
 ```
