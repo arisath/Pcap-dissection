@@ -221,4 +221,18 @@ if (httpUserAgents.size()>0)
         }
     }
 
+    /**
+     * Prints the distributions among the different image types that
+     * have been downloaded in the machine
+     */
+    static void printImageTypes()
+    {
+        PcapDissection.writer.printf("%s %d %s \n", "Found ", PcapDissection.numberOfImages, " images (images transferred over SSL/TLS not included):");
+
+        for (Map.Entry entry : PcapDissection.imageTypes.entrySet())
+        {
+            PcapDissection.writer.printf("%-4s %s %d \n", entry.getKey(), " ", entry.getValue());
+        }
+    }
+
 }

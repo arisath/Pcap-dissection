@@ -148,7 +148,7 @@ public class PcapDissection
             Utils.printHTTPServers(httpServers);
             Utils.printHTTPReferersStatistics(httpReferers);
             Utils.printHTTPRequestTypes(httpRequestTypes);
-            printImageTypes();
+            Utils.printImageTypes();
             printTCPflagsStatistics();
             printPortsUsed("Servers' ", serversPortsUsed);
             printPortsUsed("Client's ", clientPortsUsed);
@@ -530,19 +530,7 @@ public class PcapDissection
         }
     }
 
-    /**
-     * Prints the distributions among the different image types that
-     * have been downloaded in the machine
-     */
-    static void printImageTypes()
-    {
-        writer.printf("%s %d %s \n", "Found ", numberOfImages, " images (images transferred over SSL/TLS not included):");
 
-        for (Map.Entry entry : imageTypes.entrySet())
-        {
-            writer.printf("%-4s %s %d \n", entry.getKey(), " ", entry.getValue());
-        }
-    }
 
     /**
      * Adds the IP destination address to the Map of IP addresses visited
