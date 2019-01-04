@@ -42,7 +42,7 @@ public class PcapDissection
     static int numberOfPackets;
     static int numberOfPacketsSent;
     static int numberOfPacketsReceived;
-    
+
     static int numberOfARPpackets;
     static int numberOfICMPpackets;
 
@@ -86,13 +86,13 @@ public class PcapDissection
 
             writer = new PrintWriter("Report.txt", "UTF-8");
 
-           Properties prop = Utils.loadPropertiesFile("config.properties");
+            Properties prop = Utils.loadPropertiesFile("config.properties");
 
             pcapName = prop.getProperty("pcapPath");
 
             StringBuilder errbuf = new StringBuilder();
 
-             pcap = Pcap.openOffline(pcapName, errbuf);
+            pcap = Pcap.openOffline(pcapName, errbuf);
 
             if (pcap == null)
             {
@@ -413,18 +413,18 @@ public class PcapDissection
 
     }
 
-        /**
-         * Processes the HTTP response of this packet
-         */
+    /**
+     * Processes the HTTP response of this packet
+     */
     static void processHTTPResponse()
     {
         String httpResponseCode = http.fieldValue(Http.Response.ResponseCode);
 
         String httpResponseMsg = http.fieldValue(Http.Response.ResponseCodeMsg);
 
-        String httpResponse = httpResponseCode +" "+httpResponseMsg;
+        String httpResponse = httpResponseCode + " " + httpResponseMsg;
 
-        if(httpResponse!=null)
+        if (httpResponse != null)
         {
             Integer count = httpResponses.get(httpResponse);
 
@@ -446,7 +446,7 @@ public class PcapDissection
     {
         String httpServer = http.fieldValue(Http.Response.Server);
 
-        if(httpServer!=null)
+        if (httpServer != null)
         {
             String httpServerSanitised = Utils.sanitiseServerVersion(httpServer);
 
@@ -470,7 +470,7 @@ public class PcapDissection
     {
         String httpReferer = http.fieldValue(Http.Request.Referer);
 
-        if(httpReferer!=null)
+        if (httpReferer != null)
         {
             String refererHostname = Utils.extractFQDNFromUri(httpReferer);
 
@@ -494,7 +494,7 @@ public class PcapDissection
     static void processHTTPUserAgents()
     {
         String httpUserAgent = http.fieldValue(Http.Request.User_Agent);
-        if(httpUserAgent!=null)
+        if (httpUserAgent != null)
         {
             Integer count = httpReferers.get(httpUserAgent);
 
@@ -530,7 +530,6 @@ public class PcapDissection
             imageTypes.put(imageType, count + 1);
         }
     }
-
 
 
     /**
@@ -605,6 +604,7 @@ public class PcapDissection
     /**
      * Resolves the IP addresses of the input Map and assigns the netname
      * as the value of each entry
+     *
      * @param ipAddressesVisited
      * @throws Exception
      */
@@ -623,6 +623,7 @@ public class PcapDissection
     /**
      * Resolves the netname of the input IP address using the WhoIs Protocol
      * The first WhoIs server queried is whois.iana.org
+     *
      * @param IPaddress the IP address to be resolved
      * @return
      * @throws Exception
@@ -681,7 +682,7 @@ public class PcapDissection
 
             for (int i = 0; i < reply.length; i++)
             {
-                if(reply[i].startsWith("%"))
+                if (reply[i].startsWith("%"))
                 {
                     continue;
                 }
@@ -771,8 +772,6 @@ public class PcapDissection
         writer.printf("%-54s %s %8d %5.2f %s \n", "RST", ": ", numberOfRST, ((float) numberOfRST) / numberOfTcpPackets * 100, "%");
         writer.println();
     }
-
-
 
 
 }
