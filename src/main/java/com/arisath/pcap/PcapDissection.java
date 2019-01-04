@@ -19,7 +19,10 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.TreeSet;
 
 
 public class PcapDissection
@@ -165,8 +168,6 @@ public class PcapDissection
         }
 
     }
-
-
 
     /**
      * Returns the MAC address of the current machine in 00:00:00:00:00:00 format
