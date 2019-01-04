@@ -762,7 +762,7 @@ public class PcapDissection
     static void printTCPflagsStatistics()
     {
         writer.println();
-        writer.println("TCP Flags distribution: ");
+        writer.println("====================== TCP Flags distribution: ======================");
         writer.printf("%-54s %s %8d %5.2f %s \n", "SYN", ": ", numberOfSYN, ((float) numberOfSYN) / numberOfTcpPackets * 100, "%");
         writer.printf("%-54s %s %8d %5.2f %s \n", "SYN ACK", ": ", numberOfSYNACK, ((float) numberOfSYNACK) / numberOfTcpPackets * 100, "%");
         writer.printf("%-54s %s %8d %5.2f %s \n", "ACK", ": ", numberOfACK, ((float) numberOfACK) / numberOfTcpPackets * 100, "%");
