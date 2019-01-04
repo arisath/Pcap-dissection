@@ -143,17 +143,15 @@ public class PcapDissection
             pcap.loop(Pcap.LOOP_INFINITE, jpacketHandler, " *");
 
             printTrafficStatistics();
-            printTCPflagsStatistics();
             Utils.printHTTPUserAgent(httpUserAgents);
             Utils.printHTTPResponseStatistics(httpResponses);
             Utils.printHTTPServers(httpServers);
             Utils.printHTTPReferersStatistics(httpReferers);
             Utils.printHTTPRequestTypes(httpRequestTypes);
             printImageTypes();
+            printTCPflagsStatistics();
             printPortsUsed("Servers' ", serversPortsUsed);
             printPortsUsed("Client's ", clientPortsUsed);
-          //  resolveIPaddresses(ipAddressesVisited);
-          //  printIPaddressesVisited(ipAddressesVisited);
 
         }
         catch (Exception e)
@@ -752,17 +750,18 @@ public class PcapDissection
     static void printTrafficStatistics()
     {
         writer.printf("Report for " + pcapName + "\n\n");
-        writer.printf("%-46s %s %8d \n", "Total number of packets in pcap", ": ", numberOfPackets);
-        writer.printf("%-27s %-18s %s %8d %s %.2f %s \n", "Number of packets sent from", macAddress, ": ", numberOfPacketsSent, " ", ((float) numberOfPacketsSent / numberOfPackets) * 100, "%");
-        writer.printf("%-27s %-18s %s %8d %s %.2f %s \n", "Number of packets sent to", macAddress, ": ", numberOfPacketsReceived, " ", ((float) numberOfPacketsReceived / numberOfPackets) * 100, "%");
-        writer.printf("%-45s  %s %8d \n", "ARP packets", ": ", numberOfARPpackets);
+        writer.printf("====================== Overview ======================" + "\n");
+        writer.printf("%-55s %s %8d \n", "Total number of packets in pcap", ": ", numberOfPackets);
+        writer.printf("%-27s %-27s %s %8d %s %.2f %s \n", "Number of packets sent from", macAddress, ": ", numberOfPacketsSent, " ", ((float) numberOfPacketsSent / numberOfPackets) * 100, "%");
+        writer.printf("%-27s %-27s %s %8d %s %.2f %s \n", "Number of packets sent to", macAddress, ": ", numberOfPacketsReceived, " ", ((float) numberOfPacketsReceived / numberOfPackets) * 100, "%");
+        writer.printf("%-54s  %s %8d \n", "ARP packets", ": ", numberOfARPpackets);
 
-        writer.printf("%-45s  %s %8d \n", "TCP packets", ": ", numberOfTcpPackets);
-        writer.printf("%-45s  %s %8d \n", "SSL/TLS packets", ": ", numberOfSslTls);
+        writer.printf("%-54s  %s %8d \n", "TCP packets", ": ", numberOfTcpPackets);
+        writer.printf("%-54s  %s %8d \n", "SSL/TLS packets", ": ", numberOfSslTls);
 
-        writer.printf("%-45s  %s %8d \n", "UDP packets", ": ", numberOfUdpPackets);
-        writer.printf("%-45s  %s %8d \n", "DNS packets", ": ", numberOfDNS);
-        writer.printf("%-45s  %s %8d \n", "HTTP packets", ": ", numberOfHTTPpackets);
+        writer.printf("%-54s  %s %8d \n", "UDP packets", ": ", numberOfUdpPackets);
+        writer.printf("%-54s  %s %8d \n", "DNS packets", ": ", numberOfDNS);
+        writer.printf("%-54s  %s %8d \n", "HTTP packets", ": ", numberOfHTTPpackets);
     }
 
     /**
@@ -774,13 +773,13 @@ public class PcapDissection
     {
         writer.println();
         writer.println("TCP Flags distribution: ");
-        writer.printf("%-12s %s %8d %5.2f %s \n", "SYN", ": ", numberOfSYN, ((float) numberOfSYN) / numberOfTcpPackets * 100, "%");
-        writer.printf("%-12s %s %8d %5.2f %s \n", "SYN ACK", ": ", numberOfSYNACK, ((float) numberOfSYNACK) / numberOfTcpPackets * 100, "%");
-        writer.printf("%-12s %s %8d %5.2f %s \n", "ACK", ": ", numberOfACK, ((float) numberOfACK) / numberOfTcpPackets * 100, "%");
-        writer.printf("%-12s %s %8d %5.2f %s \n", "PSH ACK", ": ", numberOfPSHACK, ((float) numberOfPSHACK) / numberOfTcpPackets * 100, "%");
-        writer.printf("%-12s %s %8d %5.2f %s \n", "FIN PSH ACK", ": ", numberOfFINPSHACK, ((float) numberOfFINPSHACK) / numberOfTcpPackets * 100, "%");
-        writer.printf("%-12s %s %8d %5.2f %s \n", "FIN ACK", ": ", numberOfFINACK, ((float) numberOfFINACK) / numberOfTcpPackets * 100, "%");
-        writer.printf("%-12s %s %8d %5.2f %s \n", "RST", ": ", numberOfRST, ((float) numberOfRST) / numberOfTcpPackets * 100, "%");
+        writer.printf("%-54s %s %8d %5.2f %s \n", "SYN", ": ", numberOfSYN, ((float) numberOfSYN) / numberOfTcpPackets * 100, "%");
+        writer.printf("%-54s %s %8d %5.2f %s \n", "SYN ACK", ": ", numberOfSYNACK, ((float) numberOfSYNACK) / numberOfTcpPackets * 100, "%");
+        writer.printf("%-54s %s %8d %5.2f %s \n", "ACK", ": ", numberOfACK, ((float) numberOfACK) / numberOfTcpPackets * 100, "%");
+        writer.printf("%-54s %s %8d %5.2f %s \n", "PSH ACK", ": ", numberOfPSHACK, ((float) numberOfPSHACK) / numberOfTcpPackets * 100, "%");
+        writer.printf("%-54s %s %8d %5.2f %s \n", "FIN PSH ACK", ": ", numberOfFINPSHACK, ((float) numberOfFINPSHACK) / numberOfTcpPackets * 100, "%");
+        writer.printf("%-54s %s %8d %5.2f %s \n", "FIN ACK", ": ", numberOfFINACK, ((float) numberOfFINACK) / numberOfTcpPackets * 100, "%");
+        writer.printf("%-54s %s %8d %5.2f %s \n", "RST", ": ", numberOfRST, ((float) numberOfRST) / numberOfTcpPackets * 100, "%");
         writer.println();
     }
 
