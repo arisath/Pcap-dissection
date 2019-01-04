@@ -59,8 +59,6 @@ public class PcapDissection
     static int numberOfDNS;
 
     static int numberOfHTTPpackets;
-    static int numberOfGETS;
-    static int numberOfPosts;
     static int numberOfImages;
 
     static HashMap<String, String> ipAddressesVisited = new HashMap<String, String>();
@@ -390,15 +388,6 @@ public class PcapDissection
         }
         else
         {
-            if (http.header().contains("GET"))
-            {
-                numberOfGETS++;
-            }
-            else if (http.header().contains("POST"))
-            {
-                numberOfPosts++;
-            }
-
             processHTTPRequestMethod();
             processHTTPUserAgents();
             processHTTPReferers();
@@ -774,8 +763,6 @@ public class PcapDissection
         writer.printf("%-45s  %s %8d \n", "UDP packets", ": ", numberOfUdpPackets);
         writer.printf("%-45s  %s %8d \n", "DNS packets", ": ", numberOfDNS);
         writer.printf("%-45s  %s %8d \n", "HTTP packets", ": ", numberOfHTTPpackets);
-        writer.printf("%-45s  %s %8d \n", "Number of  GET requests", ": ", numberOfGETS);
-        writer.printf("%-45s  %s %8d \n", "Number of POST requests", ": ", numberOfPosts);
     }
 
     /**
