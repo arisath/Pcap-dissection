@@ -338,9 +338,9 @@ public class PcapDissection
 
         if (tcp.getPayload().length>0)
         {
-            String clientHello = FormatUtils.hexdump(tcp.getPayload()).substring(9, 14);
+            String clientHello = FormatUtils.hexdump(tcp.getPayload()).substring(12, 14);
 
-            if(clientHello.equals("03 01"))
+            if(clientHello.equals("01"))
             {
                numberOfClientHelloPackets++;
             }
