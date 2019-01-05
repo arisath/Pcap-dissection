@@ -25,12 +25,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TreeSet;
 
-
 public class PcapDissection
 {
-    static Pcap pcap;
-    static String pcapName;
-
     static final Ethernet ethernet = new Ethernet();
     static final Http http = new Http();
     static final Tcp tcp = new Tcp();
@@ -40,7 +36,8 @@ public class PcapDissection
     static final Ip6 ip6 = new Ip6();
     static final WebImage webimage = new WebImage();
     static final Html htm = new Html();
-
+    static Pcap pcap;
+    static String pcapName;
     static int numberOfPackets;
     static int numberOfPacketsSent;
     static int numberOfPacketsReceived;
@@ -282,14 +279,14 @@ public class PcapDissection
 
         processPorts(sport, dport);
 
-      if (dport==443)
-      {
-          processSslTlsPackets();
-      }
-        else if (sport==443)
-      {
-          processSslTlsPackets();
-      }
+        if (dport == 443)
+        {
+            processSslTlsPackets();
+        }
+        else if (sport == 443)
+        {
+            processSslTlsPackets();
+        }
 
     }
 
@@ -336,18 +333,18 @@ public class PcapDissection
     static void processSslTlsPackets()
     {
 
-        if (tcp.getPayload().length>0)
+        if (tcp.getPayload().length > 0)
         {
             String clientHello = FormatUtils.hexdump(tcp.getPayload()).substring(12, 14);
 
-            if(clientHello.equals("01"))
+            if (clientHello.equals("01"))
             {
-               numberOfClientHelloPackets++;
+                numberOfClientHelloPackets++;
             }
 
-            String serverHello = FormatUtils.hexdump(tcp.getPayload()).substring(22,24);
+            String serverHello = FormatUtils.hexdump(tcp.getPayload()).substring(22, 24);
 
-            if(serverHello.equals("02"))
+            if (serverHello.equals("02"))
             {
                 numberOfCServerHelloPackets++;
             }
