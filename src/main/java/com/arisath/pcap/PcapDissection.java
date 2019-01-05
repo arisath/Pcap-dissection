@@ -60,6 +60,7 @@ public class PcapDissection
     static int numberOfRST;
 
     static int numberOfClientHelloPackets;
+    static int numberOfCServerHelloPackets;
 
     static int numberOfSslTls;
     static int numberOfUdpPackets;
@@ -285,7 +286,11 @@ public class PcapDissection
       {
           processSslTlsPackets();
       }
-        
+        else if (sport==443)
+      {
+          processSslTlsPackets();
+      }
+
     }
 
     /**
@@ -326,17 +331,25 @@ public class PcapDissection
     }
 
     /**
-     * Inspects SSL/TLS packet for the client hello flag
+     * Inspects SSL/TLS packet for the client and server hello flags
      */
     static void processSslTlsPackets()
     {
+
         if (tcp.getPayload().length>0)
         {
             String clientHello = FormatUtils.hexdump(tcp.getPayload()).substring(9, 14);
 
             if(clientHello.equals("03 01"))
             {
-                numberOfClientHelloPackets++;
+               numberOfClientHelloPackets++;
+            }
+
+            String serverHello = FormatUtils.hexdump(tcp.getPayload()).substring(22,24);
+
+            if(serverHello.equals("02"))
+            {
+                numberOfCServerHelloPackets++;
             }
         }
     }
