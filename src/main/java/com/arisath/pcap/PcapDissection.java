@@ -5,6 +5,7 @@ import org.jnetpcap.Pcap;
 import org.jnetpcap.packet.PcapPacket;
 import org.jnetpcap.packet.PcapPacketHandler;
 import org.jnetpcap.packet.format.FormatUtils;
+import org.jnetpcap.protocol.application.Html;
 import org.jnetpcap.protocol.application.WebImage;
 import org.jnetpcap.protocol.lan.Ethernet;
 import org.jnetpcap.protocol.network.Icmp;
@@ -38,6 +39,7 @@ public class PcapDissection
     static final Icmp icmp = new Icmp();
     static final Ip6 ip6 = new Ip6();
     static final WebImage webimage = new WebImage();
+    static final Html htm = new Html();
 
     static int numberOfPackets;
     static int numberOfPacketsSent;
@@ -56,6 +58,8 @@ public class PcapDissection
     static int numberOfFINPSHACK;
     static int numberOfFINACK;
     static int numberOfRST;
+
+    static int numberOfClientHelloPackets;
 
     static int numberOfSslTls;
     static int numberOfUdpPackets;
@@ -131,12 +135,16 @@ public class PcapDissection
                             if (packet.hasHeader(http))
                             {
                                 processHTTPheader();
-
                             }
 
                             if (packet.hasHeader(webimage))
                             {
                                 processImage();
+                            }
+
+                            if (packet.hasHeader(ip6))
+                            {
+                                System.out.println("xx");
                             }
                         }
                     }
@@ -272,6 +280,12 @@ public class PcapDissection
         processTCPflags();
 
         processPorts(sport, dport);
+
+      if (dport==443)
+      {
+          processSslTlsPackets();
+      }
+        
     }
 
     /**
@@ -308,6 +322,22 @@ public class PcapDissection
         else if (tcp.flags_RST())
         {
             numberOfRST++;
+        }
+    }
+
+    /**
+     * Inspects SSL/TLS packet for the client hello flag
+     */
+    static void processSslTlsPackets()
+    {
+        if (tcp.getPayload().length>0)
+        {
+            String clientHello = FormatUtils.hexdump(tcp.getPayload()).substring(9, 14);
+
+            if(clientHello.equals("03 01"))
+            {
+                numberOfClientHelloPackets++;
+            }
         }
     }
 
@@ -371,6 +401,7 @@ public class PcapDissection
         addPorts(sport, dport);
 
         processPorts(sport, dport);
+
     }
 
     /**
