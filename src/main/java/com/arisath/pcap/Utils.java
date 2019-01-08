@@ -59,6 +59,8 @@ public class Utils
         {
             URL aURL = new URL(url);
 
+            return aURL.getHost();
+
         }
         catch (MalformedURLException malformedUrlException)
         {
@@ -134,29 +136,37 @@ public class Utils
      */
     static void printHTTPReferersStatistics(HashMap<String, Integer> httpReferers)
     {
-        int httpReferersSum = 0;
-
-        for (int value : httpReferers.values())
-        {
-            httpReferersSum += value;
-        }
-
         PcapDissection.writer.println();
 
-        PcapDissection.writer.println("====================== HTTP Referers distribution: =====================");
-
-        List<Map.Entry<String, Integer>> sortedhttpReferers = httpReferers.entrySet()
-                .stream()
-                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                .collect(Collectors.toList());
-
-        for (Map.Entry entry : sortedhttpReferers)
+        if (httpReferers.size() > 0)
         {
-            int value = (Integer) entry.getValue();
 
-            PcapDissection.writer.printf("%-50s %s %8d %7.2f %s \n", entry.getKey(), ": ", value, ((float) value) / httpReferersSum * 100, "%");
+            int httpReferersSum = 0;
+
+            for (int value : httpReferers.values())
+            {
+                httpReferersSum += value;
+            }
+
+
+            PcapDissection.writer.println("====================== HTTP Referers distribution: =====================");
+
+            List<Map.Entry<String, Integer>> sortedHttpReferers = httpReferers.entrySet()
+                    .stream()
+                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                    .collect(Collectors.toList());
+
+            for (Map.Entry entry : sortedHttpReferers)
+            {
+                int value = (Integer) entry.getValue();
+
+                PcapDissection.writer.printf("%-50s %s %8d %7.2f %s \n", entry.getKey(), ": ", value, ((float) value) / httpReferersSum * 100, "%");
+            }
         }
-
+        else
+        {
+            PcapDissection.writer.println("No HTTP Referers were identified");
+        }
         PcapDissection.writer.println();
     }
 
@@ -181,12 +191,12 @@ public class Utils
         }
         else
         {
-            System.out.println("No user agent was identified");
+            PcapDissection.writer.println("No user agent was identified");
         }
     }
 
     /**
-     * Prints the most prevalent HTTP user agent
+     * Prints the most prevalent HTTP request types
      */
     static void printHTTPRequestTypes(HashMap<String, Integer> httpRequestTypes)
     {
@@ -218,7 +228,7 @@ public class Utils
         }
         else
         {
-            System.out.println("No HTTP Requests were identified");
+            PcapDissection.writer.println("No HTTP Requests were identified");
         }
     }
 
@@ -256,7 +266,7 @@ public class Utils
         }
         else
         {
-            System.out.println("No HTTP hosts were identified");
+            PcapDissection.writer.println("No HTTP hosts were identified");
         }
     }
 
