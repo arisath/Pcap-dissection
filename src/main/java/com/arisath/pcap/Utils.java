@@ -38,19 +38,17 @@ public class Utils
 
     static String sanitiseServerVersion(String fullServerName)
     {
-        if(fullServerName.contains("nginx"))
+        if (fullServerName.contains("nginx"))
         {
             return "nginx";
-        }
-        else if(fullServerName.contains("Apache"))
+        } else if (fullServerName.contains("Apache"))
         {
             return "Apache";
-        }
-        else if(fullServerName.contains("Microsoft-IIS"))
+        } else if (fullServerName.contains("Microsoft-IIS"))
         {
             return "Microsoft-IIS";
         }
-        return  fullServerName;
+        return fullServerName;
     }
 
     static String extractFQDNFromUri(String url)
@@ -71,9 +69,9 @@ public class Utils
     /**
      * Prints the distribution among different HTTP servers
      */
-    static void printHTTPServers(HashMap<String,Integer> httpServers)
+    static void printHTTPServers(HashMap<String, Integer> httpServers)
     {
-        int httpServersSum=0;
+        int httpServersSum = 0;
 
         for (int value : httpServers.values())
         {
@@ -84,7 +82,7 @@ public class Utils
 
         PcapDissection.writer.println("====================== HTTP Servers distribution: ======================");
 
-        List<Map.Entry<String, Integer>> sortedHTTPServers =  httpServers.entrySet()
+        List<Map.Entry<String, Integer>> sortedHTTPServers = httpServers.entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .collect(Collectors.toList());
@@ -93,7 +91,7 @@ public class Utils
         {
             int value = (Integer) entry.getValue();
 
-            PcapDissection.writer.printf("%-50s %s %8d %7.2f %s \n", entry.getKey(),": ",value,  ((float) value) / httpServersSum * 100, "%");
+            PcapDissection.writer.printf("%-50s %s %8d %7.2f %s \n", entry.getKey(), ": ", value, ((float) value) / httpServersSum * 100, "%");
         }
 
         PcapDissection.writer.println();
@@ -102,9 +100,9 @@ public class Utils
     /**
      * Prints the distribution among different HTTP responses
      */
-    static void printHTTPResponseStatistics(HashMap<String,Integer> httpResponses)
+    static void printHTTPResponseStatistics(HashMap<String, Integer> httpResponses)
     {
-        int httpResponsesSum=0;
+        int httpResponsesSum = 0;
 
         for (int value : httpResponses.values())
         {
@@ -113,9 +111,9 @@ public class Utils
 
         PcapDissection.writer.println();
 
-        PcapDissection.writer.println("====================== HTTP Responses distribution: ======================");
+        PcapDissection.writer.println("====================== HTTP Responses distribution: =====================");
 
-        List<Map.Entry<String, Integer>> sortedHTTPResponses =  httpResponses.entrySet()
+        List<Map.Entry<String, Integer>> sortedHTTPResponses = httpResponses.entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByKey())
                 .collect(Collectors.toList());
@@ -124,7 +122,7 @@ public class Utils
         {
             int value = (Integer) entry.getValue();
 
-            PcapDissection.writer.printf("%-50s %s %8d %7.2f %s \n", entry.getKey(),": ",value,  ((float) value) / httpResponsesSum * 100, "%");
+            PcapDissection.writer.printf("%-50s %s %8d %7.2f %s \n", entry.getKey(), ": ", value, ((float) value) / httpResponsesSum * 100, "%");
         }
 
         PcapDissection.writer.println();
@@ -133,9 +131,9 @@ public class Utils
     /**
      * Prints the distribution among different HTTP referers
      */
-    static void printHTTPReferersStatistics(HashMap<String,Integer> httpReferers)
+    static void printHTTPReferersStatistics(HashMap<String, Integer> httpReferers)
     {
-        int httpReferersSum=0;
+        int httpReferersSum = 0;
 
         for (int value : httpReferers.values())
         {
@@ -144,9 +142,9 @@ public class Utils
 
         PcapDissection.writer.println();
 
-        PcapDissection.writer.println("====================== HTTP Referers distribution: ======================");
+        PcapDissection.writer.println("====================== HTTP ReferØers distribution: ======================");
 
-        List<Map.Entry<String, Integer>> sortedhttpReferers =  httpReferers.entrySet()
+        List<Map.Entry<String, Integer>> sortedhttpReferers = httpReferers.entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .collect(Collectors.toList());
@@ -155,7 +153,7 @@ public class Utils
         {
             int value = (Integer) entry.getValue();
 
-            PcapDissection.writer.printf("%-50s %s %8d %7.2f %s \n", entry.getKey(),": ",value,  ((float) value) / httpReferersSum * 100, "%");
+            PcapDissection.writer.printf("%-50s %s %8d %7.2f %s \n", entry.getKey(), ": ", value, ((float) value) / httpReferersSum * 100, "%");
         }
 
         PcapDissection.writer.println();
@@ -164,39 +162,39 @@ public class Utils
     /**
      * Prints the most prevalent HTTP user agent
      */
-    static void printHTTPUserAgent(HashMap<String,Integer> httpUserAgents)
+    static void printHTTPUserAgent(HashMap<String, Integer> httpUserAgents)
     {
         PcapDissection.writer.println();
 
-if (httpUserAgents.size()>0)
-{
-
-    List<Map.Entry<String, Integer>> sortedhttpReferers = httpUserAgents.entrySet()
-            .stream()
-            .sorted(Map.Entry.comparingByKey())
-            .collect(Collectors.toList());
-
-        PcapDissection.writer.println("The most prevalent user agent is: " + sortedhttpReferers.get(0));
-
-    PcapDissection.writer.println();
-}
-        else {
-    System.out.println("No user agent was identified");
-        }
-    }
-
-    /**
-     * Prints the most prevalent HTTP user agent
-     */
-    static void printHTTPRequestTypes(HashMap<String,Integer> httpRequestTypes)
-    {
-        PcapDissection.writer.println();
-
-        if (httpRequestTypes.size()>0)
+        if (httpUserAgents.size() > 0)
         {
-            PcapDissection.writer.println("====================== HTTP Request Types distribution: ======================");
 
-            int httpRequestTypesSum=0;
+            List<Map.Entry<String, Integer>> sortedhttpReferers = httpUserAgents.entrySet()
+                    .stream()
+                    .sorted(Map.Entry.comparingByKey())
+                    .collect(Collectors.toList());
+
+            PcapDissection.writer.println("The most prevalent user agent is: " + sortedhttpReferers.get(0));
+
+            PcapDissection.writer.println();
+        } else
+        {
+            System.out.println("No user agent was identified");
+        }
+    }
+
+    /**
+     * Prints the most prevalent HTTP user agent
+     */
+    static void printHTTPRequestTypes(HashMap<String, Integer> httpRequestTypes)
+    {
+        PcapDissection.writer.println();
+
+        if (httpRequestTypes.size() > 0)
+        {
+            PcapDissection.writer.println("==================== HTTP Request Types distribution: ====================");
+
+            int httpRequestTypesSum = 0;
 
             for (int value : httpRequestTypes.values())
             {
@@ -212,14 +210,52 @@ if (httpUserAgents.size()>0)
             {
                 int value = (Integer) entry.getValue();
 
-                PcapDissection.writer.printf("%-50s %s %8d %7.2f %s \n", entry.getKey(),": ",value,  ((float) value) / httpRequestTypesSum * 100, "%");
+                PcapDissection.writer.printf("%-50s %s %8d %7.2f %s \n", entry.getKey(), ": ", value, ((float) value) / httpRequestTypesSum * 100, "%");
             }
             PcapDissection.writer.println();
-        }
-        else {
+        } else
+        {
             System.out.println("No HTTP Requests were identified");
         }
     }
+
+
+    /**
+     * Prints the most prevalent HTTP user agent
+     */
+    static void printHTTPHosts(HashMap<String, Integer> httpHosts)
+    {
+        PcapDissection.writer.println();
+
+        if (httpHosts.size() > 0)
+        {
+            PcapDissection.writer.println("====================== HTTP Hosts distribution: ======================");
+
+            int httpRequestTypesSum = 0;
+
+            for (int value : httpHosts.values())
+            {
+                httpRequestTypesSum += value;
+            }
+
+            List<Map.Entry<String, Integer>> sortedHttpRequestTypes = httpHosts.entrySet()
+                    .stream()
+                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                    .collect(Collectors.toList());
+
+            for (Map.Entry entry : sortedHttpRequestTypes)
+            {
+                int value = (Integer) entry.getValue();
+
+                PcapDissection.writer.printf("%-50s %s %8d %7.2f %s \n", entry.getKey(), ": ", value, ((float) value) / httpRequestTypesSum * 100, "%");
+            }
+            PcapDissection.writer.println();
+        } else
+        {
+            System.out.println("No HTTP hosts were identified");
+        }
+    }
+
 
     /**
      * Prints the distributions among the different image types that

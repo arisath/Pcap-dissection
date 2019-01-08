@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TreeSet;
 
+import static com.arisath.pcap.Utils.printHTTPHosts;
+
 public class PcapDissection
 {
     private static final Ethernet ethernet = new Ethernet();
@@ -59,16 +61,17 @@ public class PcapDissection
     private static int numberOfUdpPackets;
     private static int numberOfDNS;
     private static int numberOfHTTPpackets;
-    private static int numberOfImages;
+    protected static int numberOfImages;
     private static HashMap<String, String> ipAddressesVisited = new HashMap<String, String>();
     private static TreeSet<Integer> clientPortsUsed = new TreeSet<Integer>();
     private static TreeSet<Integer> serversPortsUsed = new TreeSet<Integer>();
-    private static HashMap<String, Integer> imageTypes = new HashMap<String, Integer>();
+    protected static HashMap<String, Integer> imageTypes = new HashMap<String, Integer>();
     private static HashMap<String, Integer> httpRequestTypes = new HashMap<String, Integer>();
     private static HashMap<String, Integer> httpResponses = new HashMap<String, Integer>();
     private static HashMap<String, Integer> httpServers = new HashMap<String, Integer>();
     private static HashMap<String, Integer> httpReferers = new HashMap<String, Integer>();
     private static HashMap<String, Integer> httpUserAgents = new HashMap<String, Integer>();
+    private static HashMap<String, Integer> httpHosts = new HashMap<String, Integer>();
     private static String macAddress = "";
 
     public static void main(String[] args)
@@ -146,6 +149,7 @@ public class PcapDissection
             Utils.printHTTPServers(httpServers);
             Utils.printHTTPReferersStatistics(httpReferers);
             Utils.printHTTPRequestTypes(httpRequestTypes);
+            printHTTPHosts(httpHosts);
             Utils.printImageTypes();
             printTCPflagsStatistics();
             printPortsUsed("Servers' ", serversPortsUsed);
@@ -192,11 +196,7 @@ public class PcapDissection
                 return sb.toString().replaceAll("-", ":");
             }
         }
-        catch (UnknownHostException e)
-        {
-            e.printStackTrace();
-        }
-        catch (SocketException e)
+        catch (UnknownHostException | SocketException e)
         {
             e.printStackTrace();
         }
@@ -408,6 +408,7 @@ public class PcapDissection
             processHTTPServers();
         } else
         {
+            processHttpHostnames();
             processHTTPRequestMethod();
             processHTTPUserAgents();
             processHTTPReferers();
@@ -521,6 +522,26 @@ public class PcapDissection
             } else
             {
                 httpUserAgents.put(httpUserAgent, count + 1);
+            }
+        }
+    }
+
+    /*
+     * Processes the HTTP user agent of this packet
+     */
+    private static void processHttpHostnames()
+    {
+        String httpHost = http.fieldValue(Http.Request.Host);
+        if (httpHost != null)
+        {
+            Integer count = httpHosts.get(httpHost);
+
+            if (count == null)
+            {
+                httpHosts.put(httpHost, 1);
+            } else
+            {
+                httpHosts.put(httpHost, count + 1);
             }
         }
     }
@@ -750,7 +771,7 @@ public class PcapDissection
     private static void printTrafficStatistics()
     {
         writer.printf("Report for " + pcapName + "\n\n");
-        writer.printf("============================= Overview =============================" + "\n");
+        writer.printf("============================== Overview ==============================" + "\n");
         writer.printf("%-50s %s %8d \n", "Total number of packets in pcap", ": ", numberOfPackets);
         writer.printf("%-27s %-22s %s %8d %s %.2f %s \n", "Number of packets sent from", macAddress, ": ", numberOfPacketsSent, " ", ((float) numberOfPacketsSent / numberOfPackets) * 100, "%");
         writer.printf("%-27s %-22s %s %8d %s %.2f %s \n", "Number of packets sent to", macAddress, ": ", numberOfPacketsReceived, " ", ((float) numberOfPacketsReceived / numberOfPackets) * 100, "%");
