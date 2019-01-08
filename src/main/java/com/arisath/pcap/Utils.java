@@ -41,10 +41,12 @@ public class Utils
         if (fullServerName.contains("nginx"))
         {
             return "nginx";
-        } else if (fullServerName.contains("Apache"))
+        }
+        else if (fullServerName.contains("Apache"))
         {
             return "Apache";
-        } else if (fullServerName.contains("Microsoft-IIS"))
+        }
+        else if (fullServerName.contains("Microsoft-IIS"))
         {
             return "Microsoft-IIS";
         }
@@ -57,7 +59,6 @@ public class Utils
         {
             URL aURL = new URL(url);
 
-            return aURL.getHost().toString();
         }
         catch (MalformedURLException malformedUrlException)
         {
@@ -142,7 +143,7 @@ public class Utils
 
         PcapDissection.writer.println();
 
-        PcapDissection.writer.println("====================== HTTP ReferØers distribution: ======================");
+        PcapDissection.writer.println("====================== HTTP Referers distribution: =====================");
 
         List<Map.Entry<String, Integer>> sortedhttpReferers = httpReferers.entrySet()
                 .stream()
@@ -177,7 +178,8 @@ public class Utils
             PcapDissection.writer.println("The most prevalent user agent is: " + sortedhttpReferers.get(0));
 
             PcapDissection.writer.println();
-        } else
+        }
+        else
         {
             System.out.println("No user agent was identified");
         }
@@ -192,7 +194,7 @@ public class Utils
 
         if (httpRequestTypes.size() > 0)
         {
-            PcapDissection.writer.println("==================== HTTP Request Types distribution: ====================");
+            PcapDissection.writer.println("==================== HTTP Request Types distribution: ===================");
 
             int httpRequestTypesSum = 0;
 
@@ -213,7 +215,8 @@ public class Utils
                 PcapDissection.writer.printf("%-50s %s %8d %7.2f %s \n", entry.getKey(), ": ", value, ((float) value) / httpRequestTypesSum * 100, "%");
             }
             PcapDissection.writer.println();
-        } else
+        }
+        else
         {
             System.out.println("No HTTP Requests were identified");
         }
@@ -250,10 +253,38 @@ public class Utils
                 PcapDissection.writer.printf("%-50s %s %8d %7.2f %s \n", entry.getKey(), ": ", value, ((float) value) / httpRequestTypesSum * 100, "%");
             }
             PcapDissection.writer.println();
-        } else
+        }
+        else
         {
             System.out.println("No HTTP hosts were identified");
         }
+    }
+
+    /**
+     * Prints the ports that have been used
+     *
+     * @param portsUsed
+     */
+    protected static void printPortsUsed(String machine, TreeSet<Integer> portsUsed)
+    {
+        PcapDissection.writer.println();
+
+        PcapDissection.writer.println(machine + " ports utilised:");
+
+        int i = 0;
+
+        for (int port : portsUsed)
+        {
+            i++;
+
+            PcapDissection.writer.printf("%d  ", port);
+
+            if (i % 18 == 0)
+            {
+                PcapDissection.writer.println();
+            }
+        }
+        PcapDissection.writer.println();
     }
 
 
@@ -269,6 +300,37 @@ public class Utils
         {
             PcapDissection.writer.printf("%-4s %s %d \n", entry.getKey(), " ", entry.getValue());
         }
+    }
+
+    /**
+     * Grouping all other HTTP statistics printers
+     */
+    static void printHttpStatistics()
+    {
+        PcapDissection.writer.println();
+
+        PcapDissection.writer.printf("\n%-28s %-10s %28s \n", "****************", "HTTP Statistics", "****************");
+
+        printHTTPRequestTypes(PcapDissection.httpRequestTypes);
+        printHTTPResponseStatistics(PcapDissection.httpResponses);
+        printHTTPHosts(PcapDissection.httpHosts);
+        printHTTPUserAgent(PcapDissection.httpUserAgents);
+        printHTTPServers(PcapDissection.httpServers);
+        printHTTPReferersStatistics(PcapDissection.httpReferers);
+    }
+
+    /**
+     * Grouping all other TCP statistics printers
+     */
+    static void printTCPStatistics()
+    {
+        PcapDissection.writer.println();
+
+        PcapDissection.writer.printf("\n%-28s %-10s %28s \n", "****************", "TCP Statistics", "****************");
+
+        PcapDissection.printTCPflagsStatistics();
+        printPortsUsed("Servers' ", PcapDissection.serversPortsUsed);
+        printPortsUsed("Client's ", PcapDissection.clientPortsUsed);
     }
 
 }
