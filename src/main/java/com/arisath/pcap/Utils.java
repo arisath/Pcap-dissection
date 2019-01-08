@@ -93,7 +93,7 @@ public class Utils
         {
             int value = (Integer) entry.getValue();
 
-            PcapDissection.writer.printf("%-55s %s %8d %5.2f %s \n", entry.getKey(),": ",value,  ((float) value) / httpServersSum * 100, "%");
+            PcapDissection.writer.printf("%-50s %s %8d %7.2f %s \n", entry.getKey(),": ",value,  ((float) value) / httpServersSum * 100, "%");
         }
 
         PcapDissection.writer.println();
@@ -124,7 +124,7 @@ public class Utils
         {
             int value = (Integer) entry.getValue();
 
-            PcapDissection.writer.printf("%-55s %s %8d %5.2f %s \n", entry.getKey(),": ",value,  ((float) value) / httpResponsesSum * 100, "%");
+            PcapDissection.writer.printf("%-50s %s %8d %7.2f %s \n", entry.getKey(),": ",value,  ((float) value) / httpResponsesSum * 100, "%");
         }
 
         PcapDissection.writer.println();
@@ -155,7 +155,7 @@ public class Utils
         {
             int value = (Integer) entry.getValue();
 
-            PcapDissection.writer.printf("%-55s %s %8d %5.2f %s \n", entry.getKey(),": ",value,  ((float) value) / httpReferersSum * 100, "%");
+            PcapDissection.writer.printf("%-50s %s %8d %7.2f %s \n", entry.getKey(),": ",value,  ((float) value) / httpReferersSum * 100, "%");
         }
 
         PcapDissection.writer.println();
@@ -212,7 +212,7 @@ if (httpUserAgents.size()>0)
             {
                 int value = (Integer) entry.getValue();
 
-                PcapDissection.writer.printf("%-55s %s %8d %5.2f %s \n", entry.getKey(),": ",value,  ((float) value) / httpRequestTypesSum * 100, "%");
+                PcapDissection.writer.printf("%-50s %s %8d %7.2f %s \n", entry.getKey(),": ",value,  ((float) value) / httpRequestTypesSum * 100, "%");
             }
             PcapDissection.writer.println();
         }
