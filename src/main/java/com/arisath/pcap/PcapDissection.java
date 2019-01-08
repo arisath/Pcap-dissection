@@ -27,58 +27,49 @@ import java.util.TreeSet;
 
 public class PcapDissection
 {
-    static final Ethernet ethernet = new Ethernet();
-    static final Http http = new Http();
-    static final Tcp tcp = new Tcp();
-    static final Udp udp = new Udp();
-    static final Ip4 ip = new Ip4();
-    static final Icmp icmp = new Icmp();
-    static final Ip6 ip6 = new Ip6();
-    static final WebImage webimage = new WebImage();
-    static final Html htm = new Html();
-    static Pcap pcap;
-    static String pcapName;
-    static int numberOfPackets;
-    static int numberOfPacketsSent;
-    static int numberOfPacketsReceived;
-
-    static int numberOfARPpackets;
-    static int numberOfICMPpackets;
-
-    static int numberOfIPpackets;
-
-    static int numberOfTcpPackets;
-    static int numberOfSYN;
-    static int numberOfSYNACK;
-    static int numberOfACK;
-    static int numberOfPSHACK;
-    static int numberOfFINPSHACK;
-    static int numberOfFINACK;
-    static int numberOfRST;
-
-    static int numberOfClientHelloPackets;
-    static int numberOfCServerHelloPackets;
-
-    static int numberOfSslTls;
-    static int numberOfUdpPackets;
-    static int numberOfDNS;
-
-    static int numberOfHTTPpackets;
-    static int numberOfImages;
-
-    static HashMap<String, String> ipAddressesVisited = new HashMap<String, String>();
-    static TreeSet<Integer> clientPortsUsed = new TreeSet<Integer>();
-    static TreeSet<Integer> serversPortsUsed = new TreeSet<Integer>();
-    static HashMap<String, Integer> imageTypes = new HashMap<String, Integer>();
-    static HashMap<String, Integer> httpRequestTypes = new HashMap<String, Integer>();
-    static HashMap<String, Integer> httpResponses = new HashMap<String, Integer>();
-    static HashMap<String, Integer> httpServers = new HashMap<String, Integer>();
-    static HashMap<String, Integer> httpReferers = new HashMap<String, Integer>();
-    static HashMap<String, Integer> httpUserAgents = new HashMap<String, Integer>();
-
-    static String macAddress = "";
-
+    private static final Ethernet ethernet = new Ethernet();
+    private static final Http http = new Http();
+    private static final Tcp tcp = new Tcp();
+    private static final Udp udp = new Udp();
+    private static final Ip4 ip = new Ip4();
+    private static final Icmp icmp = new Icmp();
+    private static final Ip6 ip6 = new Ip6();
+    private static final WebImage webimage = new WebImage();
+    private static final Html htm = new Html();
     static PrintWriter writer;
+    private static Pcap pcap;
+    private static String pcapName;
+    private static int numberOfPackets;
+    private static int numberOfPacketsSent;
+    private static int numberOfPacketsReceived;
+    private static int numberOfARPpackets;
+    private static int numberOfICMPpackets;
+    private static int numberOfIPpackets;
+    private static int numberOfTcpPackets;
+    private static int numberOfSYN;
+    private static int numberOfSYNACK;
+    private static int numberOfACK;
+    private static int numberOfPSHACK;
+    private static int numberOfFINPSHACK;
+    private static int numberOfFINACK;
+    private static int numberOfRST;
+    private static int numberOfClientHelloPackets;
+    private static int numberOfCServerHelloPackets;
+    private static int numberOfSslTls;
+    private static int numberOfUdpPackets;
+    private static int numberOfDNS;
+    private static int numberOfHTTPpackets;
+    private static int numberOfImages;
+    private static HashMap<String, String> ipAddressesVisited = new HashMap<String, String>();
+    private static TreeSet<Integer> clientPortsUsed = new TreeSet<Integer>();
+    private static TreeSet<Integer> serversPortsUsed = new TreeSet<Integer>();
+    private static HashMap<String, Integer> imageTypes = new HashMap<String, Integer>();
+    private static HashMap<String, Integer> httpRequestTypes = new HashMap<String, Integer>();
+    private static HashMap<String, Integer> httpResponses = new HashMap<String, Integer>();
+    private static HashMap<String, Integer> httpServers = new HashMap<String, Integer>();
+    private static HashMap<String, Integer> httpReferers = new HashMap<String, Integer>();
+    private static HashMap<String, Integer> httpUserAgents = new HashMap<String, Integer>();
+    private static String macAddress = "";
 
     public static void main(String[] args)
     {
@@ -120,12 +111,10 @@ public class PcapDissection
                             if (packet.hasHeader(icmp))
                             {
                                 numberOfICMPpackets++;
-                            }
-                            else if (packet.hasHeader(tcp))
+                            } else if (packet.hasHeader(tcp))
                             {
                                 processTCPheader();
-                            }
-                            else if (packet.hasHeader(udp))
+                            } else if (packet.hasHeader(udp))
                             {
                                 processUDPheader();
                             }
@@ -161,8 +150,8 @@ public class PcapDissection
             printTCPflagsStatistics();
             printPortsUsed("Servers' ", serversPortsUsed);
             printPortsUsed("Client's ", clientPortsUsed);
-           // resolveIPaddresses(ipAddressesVisited);
-           // printIPaddressesVisited(ipAddressesVisited);
+            // resolveIPaddresses(ipAddressesVisited);
+            // printIPaddressesVisited(ipAddressesVisited);
 
         }
         catch (Exception e)
@@ -182,7 +171,7 @@ public class PcapDissection
      *
      * @return
      */
-    static String getMacAddress()
+    private static String getMacAddress()
     {
         try
         {
@@ -217,7 +206,7 @@ public class PcapDissection
     /**
      * Processes the ethernet header of this packet
      */
-    static void processEthernetheader()
+    private static void processEthernetheader()
     {
         if ((new String(FormatUtils.hexdump(ethernet.getHeader())).substring(45, 50)).equals("08 06"))
         {
@@ -234,7 +223,7 @@ public class PcapDissection
     /**
      * Processes the IP header of this packet
      */
-    static void processIPheader()
+    private static void processIPheader()
     {
         numberOfIPpackets++;
 
@@ -252,13 +241,12 @@ public class PcapDissection
      * @param sourceMac
      * @param destinationMac
      */
-    public static void separateIngoingOutgoing(String sourceMac, String destinationMac)
+    private static void separateIngoingOutgoing(String sourceMac, String destinationMac)
     {
         if (sourceMac.equalsIgnoreCase(macAddress))
         {
             numberOfPacketsSent++;
-        }
-        else if (destinationMac.equalsIgnoreCase(macAddress))
+        } else if (destinationMac.equalsIgnoreCase(macAddress))
         {
             numberOfPacketsReceived++;
         }
@@ -267,7 +255,7 @@ public class PcapDissection
     /**
      * Processes the TCP header of this packet
      */
-    static void processTCPheader()
+    private static void processTCPheader()
     {
         numberOfTcpPackets++;
 
@@ -284,8 +272,7 @@ public class PcapDissection
         if (dport == 443)
         {
             processSslTlsPackets();
-        }
-        else if (sport == 443)
+        } else if (sport == 443)
         {
             processSslTlsPackets();
         }
@@ -297,33 +284,27 @@ public class PcapDissection
      * TCP Flags include: [SYN], [SYN ACK], [ACK], [PSH ACK]
      * [FIN PSH ACK], [FIN ACK], [RST]
      */
-    static void processTCPflags()
+    private static void processTCPflags()
     {
         if (tcp.flags_SYN() && (!tcp.flags_ACK()))
         {
             numberOfSYN++;
-        }
-        else if (tcp.flags_SYN() && tcp.flags_ACK())
+        } else if (tcp.flags_SYN() && tcp.flags_ACK())
         {
             numberOfSYNACK++;
-        }
-        else if (tcp.flags_ACK() && (!tcp.flags_SYN()) && (!tcp.flags_PSH()) && (!tcp.flags_FIN()) && (!tcp.flags_RST()))
+        } else if (tcp.flags_ACK() && (!tcp.flags_SYN()) && (!tcp.flags_PSH()) && (!tcp.flags_FIN()) && (!tcp.flags_RST()))
         {
             numberOfACK++;
-        }
-        else if (tcp.flags_PSH() && (tcp.flags_ACK() && (!tcp.flags_FIN())))
+        } else if (tcp.flags_PSH() && (tcp.flags_ACK() && (!tcp.flags_FIN())))
         {
             numberOfPSHACK++;
-        }
-        else if (tcp.flags_FIN() && tcp.flags_ACK() && (!tcp.flags_PSH()))
+        } else if (tcp.flags_FIN() && tcp.flags_ACK() && (!tcp.flags_PSH()))
         {
             numberOfFINACK++;
-        }
-        else if (tcp.flags_PSH() && (tcp.flags_ACK() && (tcp.flags_FIN())))
+        } else if (tcp.flags_PSH() && (tcp.flags_ACK() && (tcp.flags_FIN())))
         {
             numberOfFINPSHACK++;
-        }
-        else if (tcp.flags_RST())
+        } else if (tcp.flags_RST())
         {
             numberOfRST++;
         }
@@ -332,7 +313,7 @@ public class PcapDissection
     /**
      * Inspects SSL/TLS packet for the client and server hello flags
      */
-    static void processSslTlsPackets()
+    private static void processSslTlsPackets()
     {
 
         if (tcp.getPayload().length > 0)
@@ -359,13 +340,12 @@ public class PcapDissection
      * @param sport sourcePort
      * @param dport destinationPort
      */
-    static void processPorts(int sport, int dport)
+    private static void processPorts(int sport, int dport)
     {
         if (sport == 53 || dport == 53)
         {
             numberOfDNS++;
-        }
-        else if (sport == 443 || dport == 443)
+        } else if (sport == 443 || dport == 443)
         {
             numberOfSslTls++;
         }
@@ -379,7 +359,7 @@ public class PcapDissection
      * @param sport
      * @param dport
      */
-    static void addPorts(int sport, int dport)
+    private static void addPorts(int sport, int dport)
     {
         String sourceMac = FormatUtils.mac(ethernet.source());
 
@@ -390,8 +370,7 @@ public class PcapDissection
             clientPortsUsed.add(sport);
 
             serversPortsUsed.add(dport);
-        }
-        else if (destinationMac.equals(macAddress))
+        } else if (destinationMac.equals(macAddress))
         {
             clientPortsUsed.add(dport);
 
@@ -402,7 +381,7 @@ public class PcapDissection
     /**
      * Processes the UDP header of this packet
      */
-    static void processUDPheader()
+    private static void processUDPheader()
     {
         numberOfUdpPackets++;
 
@@ -419,7 +398,7 @@ public class PcapDissection
     /**
      * Processes the HTTP header of this packet
      */
-    static void processHTTPheader()
+    private static void processHTTPheader()
     {
         numberOfHTTPpackets++;
 
@@ -427,8 +406,7 @@ public class PcapDissection
         {
             processHTTPResponse();
             processHTTPServers();
-        }
-        else
+        } else
         {
             processHTTPRequestMethod();
             processHTTPUserAgents();
@@ -439,7 +417,7 @@ public class PcapDissection
     /**
      * Processes the HTTP request type of this packet
      */
-    static void processHTTPRequestMethod()
+    private static void processHTTPRequestMethod()
     {
         String requestMethod = http.fieldValue(Http.Request.RequestMethod);
 
@@ -448,8 +426,7 @@ public class PcapDissection
         if (count == null)
         {
             httpRequestTypes.put(requestMethod, 1);
-        }
-        else
+        } else
         {
             httpRequestTypes.put(requestMethod, count + 1);
         }
@@ -459,7 +436,7 @@ public class PcapDissection
     /**
      * Processes the HTTP response of this packet
      */
-    static void processHTTPResponse()
+    private static void processHTTPResponse()
     {
         String httpResponseCode = http.fieldValue(Http.Response.ResponseCode);
 
@@ -474,8 +451,7 @@ public class PcapDissection
             if (count == null)
             {
                 httpResponses.put(httpResponse, 1);
-            }
-            else
+            } else
             {
                 httpResponses.put(httpResponse, count + 1);
             }
@@ -485,7 +461,7 @@ public class PcapDissection
     /*
      * Processes the HTTP server of this packet
      */
-    static void processHTTPServers()
+    private static void processHTTPServers()
     {
         String httpServer = http.fieldValue(Http.Response.Server);
 
@@ -498,8 +474,7 @@ public class PcapDissection
             if (count == null)
             {
                 httpServers.put(httpServerSanitised, 1);
-            }
-            else
+            } else
             {
                 httpServers.put(httpServerSanitised, count + 1);
             }
@@ -509,7 +484,7 @@ public class PcapDissection
     /*
      * Processes the HTTP server of this packet
      */
-    static void processHTTPReferers()
+    private static void processHTTPReferers()
     {
         String httpReferer = http.fieldValue(Http.Request.Referer);
 
@@ -522,8 +497,7 @@ public class PcapDissection
             if (count == null)
             {
                 httpReferers.put(refererHostname, 1);
-            }
-            else
+            } else
             {
                 httpReferers.put(refererHostname, count + 1);
             }
@@ -532,9 +506,9 @@ public class PcapDissection
 
 
     /*
-       * Processes the HTTP user agent of this packet
-       */
-    static void processHTTPUserAgents()
+     * Processes the HTTP user agent of this packet
+     */
+    private static void processHTTPUserAgents()
     {
         String httpUserAgent = http.fieldValue(Http.Request.User_Agent);
         if (httpUserAgent != null)
@@ -544,8 +518,7 @@ public class PcapDissection
             if (count == null)
             {
                 httpUserAgents.put(httpUserAgent, 1);
-            }
-            else
+            } else
             {
                 httpUserAgents.put(httpUserAgent, count + 1);
             }
@@ -556,7 +529,7 @@ public class PcapDissection
      * Processes images transferred over HTTP
      * Images transferred over SSL/TLS are not processed
      */
-    static void processImage()
+    private static void processImage()
     {
         numberOfImages++;
 
@@ -567,8 +540,7 @@ public class PcapDissection
         if (count == null)
         {
             imageTypes.put(imageType, 1);
-        }
-        else
+        } else
         {
             imageTypes.put(imageType, count + 1);
         }
@@ -581,7 +553,7 @@ public class PcapDissection
      * @param sourceMac
      * @param destinationIP
      */
-    static void getDestinationAddress(String sourceMac, String destinationIP)
+    private static void getDestinationAddress(String sourceMac, String destinationIP)
     {
         try
         {
@@ -601,7 +573,7 @@ public class PcapDissection
      *
      * @param portsUsed
      */
-    static void printPortsUsed(String machine, TreeSet<Integer> portsUsed)
+    private static void printPortsUsed(String machine, TreeSet<Integer> portsUsed)
     {
         writer.println();
 
@@ -628,7 +600,7 @@ public class PcapDissection
      *
      * @param ipAddressesVisited
      */
-    static void printIPaddressesVisited(HashMap<String, String> ipAddressesVisited) throws Exception
+    private static void printIPaddressesVisited(HashMap<String, String> ipAddressesVisited) throws Exception
     {
         writer.println();
 
@@ -651,7 +623,7 @@ public class PcapDissection
      * @param ipAddressesVisited
      * @throws Exception
      */
-    static void resolveIPaddresses(HashMap<String, String> ipAddressesVisited) throws Exception
+    private static void resolveIPaddresses(HashMap<String, String> ipAddressesVisited) throws Exception
     {
         for (Map.Entry entry : ipAddressesVisited.entrySet())
         {
@@ -671,7 +643,7 @@ public class PcapDissection
      * @return
      * @throws Exception
      */
-    static String resolveNetname(String IPaddress) throws Exception
+    private static String resolveNetname(String IPaddress) throws Exception
     {
         try
         {
@@ -713,8 +685,7 @@ public class PcapDissection
             if (tld.equals("com"))
             {
                 queryResult = whoisClient.query("domain " + IPaddress);
-            }
-            else
+            } else
             {
                 queryResult = whoisClient.query(IPaddress);
             }
@@ -733,18 +704,15 @@ public class PcapDissection
                 {
                     netname = reply[i].substring(16);
                     break;
-                }
-                else if (reply[i].startsWith("netname"))
+                } else if (reply[i].startsWith("netname"))
                 {
                     netname = reply[i].substring(16);
                     break;
-                }
-                else if (reply[i].startsWith("status"))
+                } else if (reply[i].startsWith("status"))
                 {
                     netname = reply[i].substring(16);
                     break;
-                }
-                else if (reply[i].startsWith("Organization"))
+                } else if (reply[i].startsWith("Organization"))
                 {
                     netname = reply[i].substring(16);
                     break;
@@ -759,8 +727,7 @@ public class PcapDissection
             if (!netname.equals(""))
             {
                 return netname;
-            }
-            else
+            } else
             {
                 return "Not resolved";
             }
@@ -780,7 +747,7 @@ public class PcapDissection
      * Prints traffic statistics related to different protocols from different OSI layers
      * Protocols include: Ethernet, ARP, IP, TCP/UDP, SSL/TLS, DNS, HTTP
      */
-    static void printTrafficStatistics()
+    private static void printTrafficStatistics()
     {
         writer.printf("Report for " + pcapName + "\n\n");
         writer.printf("============================= Overview =============================" + "\n");
@@ -802,7 +769,7 @@ public class PcapDissection
      * TCP Flags include: [SYN], [SYN ACK], [ACK], [PSH ACK]
      * [FIN PSH ACK], [FIN ACK], [RST]
      */
-    static void printTCPflagsStatistics()
+    private static void printTCPflagsStatistics()
     {
         writer.println();
         writer.println("====================== TCP Flags distribution: ======================");
