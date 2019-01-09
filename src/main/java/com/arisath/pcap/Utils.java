@@ -299,6 +299,25 @@ public class Utils
 
 
     /**
+     * Prints the different SSL/TLS related messages
+     */
+    static void printSslTlsStatistics()
+    {
+        PcapDissection.writer.println();
+
+        PcapDissection.writer.println("====================== SSL/TLS Statistics: ======================");
+
+        PcapDissection.writer.printf("%-50s %s %8d  \n", "Client Hello", ": ", PcapDissection.numberOfClientHelloPackets);
+        PcapDissection.writer.printf("%-50s %s %8d  \n", "Server Hello", ": ", PcapDissection.numberOfCServerHelloPackets);
+        PcapDissection.writer.println();
+
+    }
+
+
+
+
+
+    /**
      * Prints the distributions among the different image types that
      * have been downloaded in the machine
      */
@@ -339,6 +358,7 @@ public class Utils
         PcapDissection.writer.printf("\n%-28s %-10s %28s \n", "****************", "TCP Statistics", "****************");
 
         PcapDissection.printTcpFlagsStatistics();
+        printSslTlsStatistics();
         printPortsUsed("Servers' ", PcapDissection.serversPortsUsed);
         printPortsUsed("Client's ", PcapDissection.clientPortsUsed);
     }

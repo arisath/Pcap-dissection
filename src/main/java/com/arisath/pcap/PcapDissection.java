@@ -55,8 +55,8 @@ public class PcapDissection
     private static int numberOfFINPSHACK;
     private static int numberOfFINACK;
     private static int numberOfRST;
-    private static int numberOfClientHelloPackets;
-    private static int numberOfCServerHelloPackets;
+    protected static int numberOfClientHelloPackets;
+    protected static int numberOfCServerHelloPackets;
     private static int numberOfSslTls;
     private static int numberOfUdpPackets;
     private static int numberOfDNS;
