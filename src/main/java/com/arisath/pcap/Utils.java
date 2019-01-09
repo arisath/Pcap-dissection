@@ -53,7 +53,7 @@ public class Utils
         return fullServerName;
     }
 
-    static String extractFQDNFromUri(String url)
+    static String extractFqdnFromUri(String url)
     {
         try
         {
@@ -72,7 +72,7 @@ public class Utils
     /**
      * Prints the distribution among different HTTP servers
      */
-    static void printHTTPServers(HashMap<String, Integer> httpServers)
+    static void printHttp(HashMap<String, Integer> httpServers)
     {
         int httpServersSum = 0;
 
@@ -103,7 +103,7 @@ public class Utils
     /**
      * Prints the distribution among different HTTP responses
      */
-    static void printHTTPResponseStatistics(HashMap<String, Integer> httpResponses)
+    static void printHttpResponseStatistics(HashMap<String, Integer> httpResponses)
     {
         int httpResponsesSum = 0;
 
@@ -134,7 +134,7 @@ public class Utils
     /**
      * Prints the distribution among different HTTP referers
      */
-    static void printHTTPReferersStatistics(HashMap<String, Integer> httpReferers)
+    static void printHttpReferersStatistics(HashMap<String, Integer> httpReferers)
     {
         PcapDissection.writer.println();
 
@@ -173,7 +173,7 @@ public class Utils
     /**
      * Prints the most prevalent HTTP user agent
      */
-    static void printHTTPUserAgent(HashMap<String, Integer> httpUserAgents)
+    static void printHttpUserAgent(HashMap<String, Integer> httpUserAgents)
     {
         PcapDissection.writer.println();
 
@@ -198,7 +198,7 @@ public class Utils
     /**
      * Prints the most prevalent HTTP request types
      */
-    static void printHTTPRequestTypes(HashMap<String, Integer> httpRequestTypes)
+    static void printHttpRequestTypes(HashMap<String, Integer> httpRequestTypes)
     {
         PcapDissection.writer.println();
 
@@ -236,7 +236,7 @@ public class Utils
     /**
      * Prints the most prevalent HTTP user agent
      */
-    static void printHTTPHosts(HashMap<String, Integer> httpHosts)
+    static void printHttpHosts(HashMap<String, Integer> httpHosts)
     {
         PcapDissection.writer.println();
 
@@ -321,24 +321,24 @@ public class Utils
 
         PcapDissection.writer.printf("\n%-28s %-10s %28s \n", "****************", "HTTP Statistics", "****************");
 
-        printHTTPRequestTypes(PcapDissection.httpRequestTypes);
-        printHTTPResponseStatistics(PcapDissection.httpResponses);
-        printHTTPHosts(PcapDissection.httpHosts);
-        printHTTPUserAgent(PcapDissection.httpUserAgents);
-        printHTTPServers(PcapDissection.httpServers);
-        printHTTPReferersStatistics(PcapDissection.httpReferers);
+        printHttpRequestTypes(PcapDissection.httpRequestTypes);
+        printHttpResponseStatistics(PcapDissection.httpResponses);
+        printHttpHosts(PcapDissection.httpHosts);
+        printHttpUserAgent(PcapDissection.httpUserAgents);
+        printHttp(PcapDissection.httpServers);
+        printHttpReferersStatistics(PcapDissection.httpReferers);
     }
 
     /**
      * Grouping all other TCP statistics printers
      */
-    static void printTCPStatistics()
+    static void printTcpStatistics()
     {
         PcapDissection.writer.println();
 
         PcapDissection.writer.printf("\n%-28s %-10s %28s \n", "****************", "TCP Statistics", "****************");
 
-        PcapDissection.printTCPflagsStatistics();
+        PcapDissection.printTcpFlagsStatistics();
         printPortsUsed("Servers' ", PcapDissection.serversPortsUsed);
         printPortsUsed("Client's ", PcapDissection.clientPortsUsed);
     }

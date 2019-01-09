@@ -25,8 +25,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TreeSet;
 
-import static com.arisath.pcap.Utils.printHTTPHosts;
-
 public class PcapDissection
 {
     private static final Ethernet ethernet = new Ethernet();
@@ -121,12 +119,12 @@ public class PcapDissection
                             }
                             else if (packet.hasHeader(udp))
                             {
-                                processUDPheader();
+                                processUdpHeader();
                             }
 
                             if (packet.hasHeader(http))
                             {
-                                processHTTPheader();
+                                processHttpHeader();
                             }
 
                             if (packet.hasHeader(webimage))
@@ -148,7 +146,7 @@ public class PcapDissection
             printTrafficStatistics();
             Utils.printHttpStatistics();
             Utils.printImageTypes();
-            Utils.printTCPStatistics();
+            Utils.printTcpStatistics();
             // resolveIPaddresses(ipAddressesVisited);
             // printIPaddressesVisited(ipAddressesVisited);
 
@@ -386,7 +384,7 @@ public class PcapDissection
     /**
      * Processes the UDP header of this packet
      */
-    private static void processUDPheader()
+    private static void processUdpHeader()
     {
         numberOfUdpPackets++;
 
@@ -403,28 +401,28 @@ public class PcapDissection
     /**
      * Processes the HTTP header of this packet
      */
-    private static void processHTTPheader()
+    private static void processHttpHeader()
     {
         numberOfHTTPpackets++;
 
         if (http.isResponse())
         {
-            processHTTPResponse();
-            processHTTPServers();
+            processHttpResponse();
+            processHttpServers();
         }
         else
         {
             processHttpHostnames();
-            processHTTPRequestMethod();
-            processHTTPUserAgents();
-            processHTTPReferers();
+            processHttpRequestMethod();
+            processHttpUserAgents();
+            processHttpReferers();
         }
     }
 
     /**
      * Processes the HTTP request type of this packet
      */
-    private static void processHTTPRequestMethod()
+    private static void processHttpRequestMethod()
     {
         String requestMethod = http.fieldValue(Http.Request.RequestMethod);
 
@@ -444,7 +442,7 @@ public class PcapDissection
     /**
      * Processes the HTTP response of this packet
      */
-    private static void processHTTPResponse()
+    private static void processHttpResponse()
     {
         String httpResponseCode = http.fieldValue(Http.Response.ResponseCode);
 
@@ -470,7 +468,7 @@ public class PcapDissection
     /*
      * Processes the HTTP server of this packet
      */
-    private static void processHTTPServers()
+    private static void processHttpServers()
     {
         String httpServer = http.fieldValue(Http.Response.Server);
 
@@ -494,13 +492,13 @@ public class PcapDissection
     /*
      * Processes the HTTP server of this packet
      */
-    private static void processHTTPReferers()
+    private static void processHttpReferers()
     {
         String httpReferer = http.fieldValue(Http.Request.Referer);
 
         if (httpReferer != null)
         {
-            String refererHostname = Utils.extractFQDNFromUri(httpReferer);
+            String refererHostname = Utils.extractFqdnFromUri(httpReferer);
 
             Integer count = httpReferers.get(refererHostname);
 
@@ -519,7 +517,7 @@ public class PcapDissection
     /*
      * Processes the HTTP user agent of this packet
      */
-    private static void processHTTPUserAgents()
+    private static void processHttpUserAgents()
     {
         String httpUserAgent = http.fieldValue(Http.Request.User_Agent);
         if (httpUserAgent != null)
@@ -783,7 +781,7 @@ public class PcapDissection
      * TCP Flags include: [SYN], [SYN ACK], [ACK], [PSH ACK]
      * [FIN PSH ACK], [FIN ACK], [RST]
      */
-    protected static void printTCPflagsStatistics()
+    protected static void printTcpFlagsStatistics()
     {
         writer.println();
         writer.println("====================== TCP Flags distribution: ======================");
