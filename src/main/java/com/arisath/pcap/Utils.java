@@ -1,6 +1,8 @@
 package com.arisath.pcap;
 
 import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import java.io.FileOutputStream;
@@ -11,6 +13,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by BDC on 2/1/2019.
@@ -378,11 +381,23 @@ public class Utils
 
             document.open();
             Font font = FontFactory.getFont(FontFactory.COURIER, 18, BaseColor.DARK_GRAY);
+            Font font2 = FontFactory.getFont(FontFactory.COURIER, 15, BaseColor.BLACK);
+
             Paragraph title = new Paragraph("Report for " + PcapDissection.pcapName, font);
             title.setAlignment(Element.ALIGN_CENTER);
 
+            Paragraph overview = new Paragraph("================== Overview ==================", font2);
+
+            PdfPTable table = new PdfPTable(2);
+            addTableHeader(table);
+            addRows(table);
+
+            document.add(table);
 
             document.add(title);
+
+            document.add(overview);
+
             document.close();
         }
         catch (Exception e)
@@ -391,5 +406,22 @@ public class Utils
         }
     }
 
+    static private void addTableHeader(PdfPTable table) {
+        Stream.of("column header 1","column header 2")
+                .forEach(columnTitle -> {
+                    PdfPCell header = new PdfPCell();
+                    header.setBackgroundColor(BaseColor.LIGHT_GRAY);
+                    header.setBorderWidth(2);
+                    header.setPhrase(new Phrase(columnTitle));
+                    table.addCell(header);
+                });
+    }
+
+
+    static private void addRows(PdfPTable table) {
+        table.addCell("row 1, col 1");
+        table.addCell("row 1, col 2");
+        table.addCell("row 1, col 3");
+    }
 
 }
