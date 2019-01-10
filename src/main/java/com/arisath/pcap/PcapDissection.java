@@ -40,7 +40,7 @@ public class PcapDissection
     protected static HashMap<String, Integer> imageTypes = new HashMap<String, Integer>();
     static PrintWriter writer;
     private static Pcap pcap;
-    private static String pcapName;
+    protected static String pcapName;
     private static int numberOfPackets;
     private static int numberOfPacketsSent;
     private static int numberOfPacketsReceived;
@@ -149,6 +149,8 @@ public class PcapDissection
             Utils.printTcpStatistics();
             // resolveIPaddresses(ipAddressesVisited);
             // printIPaddressesVisited(ipAddressesVisited);
+
+            Utils.createPdf();
 
         }
         catch (Exception e)

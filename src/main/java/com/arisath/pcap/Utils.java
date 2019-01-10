@@ -1,10 +1,15 @@
 package com.arisath.pcap;
 
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.PdfWriter;
+
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -362,5 +367,29 @@ public class Utils
         printPortsUsed("Servers' ", PcapDissection.serversPortsUsed);
         printPortsUsed("Client's ", PcapDissection.clientPortsUsed);
     }
+
+    static void createPdf()
+
+    {
+        try
+        {
+            Document document = new Document();
+            PdfWriter.getInstance(document, new FileOutputStream("ExampleReport.pdf"));
+
+            document.open();
+            Font font = FontFactory.getFont(FontFactory.COURIER, 18, BaseColor.DARK_GRAY);
+            Paragraph title = new Paragraph("Report for " + PcapDissection.pcapName, font);
+            title.setAlignment(Element.ALIGN_CENTER);
+
+
+            document.add(title);
+            document.close();
+        }
+        catch (Exception e)
+        {
+           e.printStackTrace();
+        }
+    }
+
 
 }
