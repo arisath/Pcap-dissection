@@ -629,7 +629,7 @@ public class PcapDissection
      * Resolves the IP addresses of the input Map and assigns the netname
      * as the value of each entry
      *
-     * @param ipAddressesVisited
+     * @param ipAddressesVisited The IP address visited from the host
      * @throws Exception
      */
     private static void resolveIPaddresses(HashMap<String, String> ipAddressesVisited) throws Exception
@@ -649,7 +649,7 @@ public class PcapDissection
      * The first WhoIs server queried is whois.iana.org
      *
      * @param IPaddress the IP address to be resolved
-     * @return
+     * @return The whoIs record associated with the IP address
      * @throws Exception
      */
     private static String resolveNetname(String IPaddress) throws Exception
@@ -783,7 +783,7 @@ public class PcapDissection
      * TCP Flags include: [SYN], [SYN ACK], [ACK], [PSH ACK]
      * [FIN PSH ACK], [FIN ACK], [RST]
      */
-    protected static void printTcpFlagsStatistics()
+    private static void printTcpFlagsStatistics()
     {
         writer.println();
         writer.println("====================== TCP Flags distribution: ======================");
