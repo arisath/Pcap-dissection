@@ -1,7 +1,21 @@
 # Pcap-dissection
 Pcap dissector implemented in Java using jnetpcap (http://jnetpcap.com/)
 
+[![Generic badge](https://img.shields.io/badge/WIRESHARK-PCAP-<COLOR>.svg)](https://shields.io/)
+![star this repo](http://githubbadges.com/star.svg?user=arisath&repo=Pcap-dissection)
 
+
+### Prerequisites
+```
+WinPcap/libpcap
+Maven
+Java 8+
+```
+
+### Installing
+```
+mvn clean install
+```
 
 
 ## Metrics computed include:
@@ -9,6 +23,8 @@ Pcap dissector implemented in Java using jnetpcap (http://jnetpcap.com/)
 * HTTP packets
 * Number of GET requests
 * Number of POST requests
+* Distribution of HTTP responses
+* HTTP servers
 * Images downloaded
 * DNS packets
 * TCP packets
