@@ -783,7 +783,7 @@ public class PcapDissection
      * TCP Flags include: [SYN], [SYN ACK], [ACK], [PSH ACK]
      * [FIN PSH ACK], [FIN ACK], [RST]
      */
-    private static void printTcpFlagsStatistics()
+    protected static void printTcpFlagsStatistics()
     {
         writer.println();
         writer.println("====================== TCP Flags distribution: ======================");
