@@ -5,13 +5,11 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -43,6 +41,46 @@ public class Utils
         }
         return null;
     }
+
+    protected static HashMap loadPorts(String filename) throws IOException
+    {
+        BufferedReader br = null;
+        HashMap<String, String> map = new HashMap<String, String>();
+        try
+        {
+            ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+
+            InputStream is = classloader.getResourceAsStream(filename);
+
+            br = new BufferedReader(new InputStreamReader(is));
+
+            String line;
+
+            while ((line = br.readLine()) != null)
+            {
+                String[] parts = line.split(":");
+                if (parts.length >= 2)
+                {
+                    String key = parts[0];
+                    System.out.println(key);
+                    String value = parts[1];
+                    map.put(key, value);
+                }
+            }
+            br.close();
+            return map;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            br.close();
+        }
+        return null;
+    }
+
 
     static String sanitiseServerVersion(String fullServerName)
     {
@@ -322,9 +360,6 @@ public class Utils
     }
 
 
-
-
-
     /**
      * Prints the distributions among the different image types that
      * have been downloaded in the machine
@@ -402,12 +437,13 @@ public class Utils
         }
         catch (Exception e)
         {
-           e.printStackTrace();
+            e.printStackTrace();
         }
     }
 
-    static private void addTableHeader(PdfPTable table) {
-        Stream.of("column header 1","column header 2")
+    static private void addTableHeader(PdfPTable table)
+    {
+        Stream.of("column header 1", "column header 2")
                 .forEach(columnTitle -> {
                     PdfPCell header = new PdfPCell();
                     header.setBackgroundColor(BaseColor.LIGHT_GRAY);
@@ -418,7 +454,8 @@ public class Utils
     }
 
 
-    static private void addRows(PdfPTable table) {
+    static private void addRows(PdfPTable table)
+    {
         table.addCell("row 1, col 1");
         table.addCell("row 1, col 2");
         table.addCell("row 1, col 3");

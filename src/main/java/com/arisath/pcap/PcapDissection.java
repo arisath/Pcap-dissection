@@ -15,6 +15,7 @@ import org.jnetpcap.protocol.tcpip.Http;
 import org.jnetpcap.protocol.tcpip.Tcp;
 import org.jnetpcap.protocol.tcpip.Udp;
 
+import javax.swing.*;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -38,9 +39,19 @@ public class PcapDissection
     private static final Html htm = new Html();
     protected static int numberOfImages;
     protected static HashMap<String, Integer> imageTypes = new HashMap<String, Integer>();
+    protected static String pcapName;
+    protected static int numberOfClientHelloPackets;
+    protected static int numberOfCServerHelloPackets;
+    protected static TreeSet<Integer> clientPortsUsed = new TreeSet<Integer>();
+    protected static TreeSet<Integer> serversPortsUsed = new TreeSet<Integer>();
+    protected static HashMap<String, Integer> httpRequestTypes = new HashMap<String, Integer>();
+    protected static HashMap<String, Integer> httpResponses = new HashMap<String, Integer>();
+    protected static HashMap<String, Integer> httpServers = new HashMap<String, Integer>();
+    protected static HashMap<String, Integer> httpReferers = new HashMap<String, Integer>();
+    protected static HashMap<String, Integer> httpUserAgents = new HashMap<String, Integer>();
+    protected static HashMap<String, Integer> httpHosts = new HashMap<String, Integer>();
     static PrintWriter writer;
     private static Pcap pcap;
-    protected static String pcapName;
     private static int numberOfPackets;
     private static int numberOfPacketsSent;
     private static int numberOfPacketsReceived;
@@ -55,21 +66,11 @@ public class PcapDissection
     private static int numberOfFINPSHACK;
     private static int numberOfFINACK;
     private static int numberOfRST;
-    protected static int numberOfClientHelloPackets;
-    protected static int numberOfCServerHelloPackets;
     private static int numberOfSslTls;
     private static int numberOfUdpPackets;
     private static int numberOfDNS;
     private static int numberOfHTTPpackets;
     private static HashMap<String, String> ipAddressesVisited = new HashMap<String, String>();
-    protected static TreeSet<Integer> clientPortsUsed = new TreeSet<Integer>();
-    protected static TreeSet<Integer> serversPortsUsed = new TreeSet<Integer>();
-    protected static HashMap<String, Integer> httpRequestTypes = new HashMap<String, Integer>();
-    protected static HashMap<String, Integer> httpResponses = new HashMap<String, Integer>();
-    protected static HashMap<String, Integer> httpServers = new HashMap<String, Integer>();
-    protected static HashMap<String, Integer> httpReferers = new HashMap<String, Integer>();
-    protected static HashMap<String, Integer> httpUserAgents = new HashMap<String, Integer>();
-    protected static HashMap<String, Integer> httpHosts = new HashMap<String, Integer>();
     private static String macAddress = "";
 
     public static void main(String[] args)
@@ -147,8 +148,9 @@ public class PcapDissection
             Utils.printHttpStatistics();
             Utils.printImageTypes();
             Utils.printTcpStatistics();
-            // resolveIPaddresses(ipAddressesVisited);
-            // printIPaddressesVisited(ipAddressesVisited);
+            Map map = Utils.loadPorts("portlist");
+            resolveIPaddresses(ipAddressesVisited);
+            printIPaddressesVisited (ipAddressesVisited);
 
             Utils.createPdf();
 
@@ -601,7 +603,6 @@ public class PcapDissection
             e.printStackTrace();
         }
     }
-
 
 
     /**
