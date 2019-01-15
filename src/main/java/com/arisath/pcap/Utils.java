@@ -319,7 +319,7 @@ public class Utils
     /**
      * Prints the ports that have been used
      *
-     * @param portsUsed
+     * @param portsUsed A tree with the ports used
      */
     protected static void printPortsUsed(String machine, TreeSet<Integer> portsUsed)
     {
